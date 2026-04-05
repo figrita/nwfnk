@@ -40,7 +40,7 @@
   .top-bar { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; border-bottom: 2px solid var(--tortoise); padding-bottom: 10px; }
   .top-bar h1 { font-family: var(--font-display); font-size: 22px; font-weight: 400; color: var(--text-primary); letter-spacing: -0.5px; }
   .top-bar h1 em { font-style: italic; color: var(--tortoise); }
-  .top-bar .tuning { font-family: var(--font-mono); font-size: 12px; color: var(--text-tertiary); letter-spacing: 1px; }
+  .top-bar .tuning { font-family: var(--font-mono); font-size: 12px; color: var(--text-tertiary); letter-spacing: 1px; width: 250px; text-align: right; flex-shrink: 0; }
   .top-bar .root-select {
     font-family: var(--font-mono); font-size: 13px; font-weight: 600;
     padding: 4px 10px; border-radius: 5px; border: 1.5px solid var(--border);
@@ -48,6 +48,50 @@
     letter-spacing: 0.5px;
   }
   .top-bar .root-select:focus { outline: none; border-color: var(--tortoise); }
+  .capo-wrap {
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .capo-wrap label {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--text-tertiary);
+  }
+  .capo-btn {
+    font-family: var(--font-mono); font-size: 14px; font-weight: 600;
+    width: 24px; height: 24px; border-radius: 5px; border: 1.5px solid var(--border);
+    background: var(--bg-warm); color: var(--tortoise); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; padding: 0;
+    line-height: 1; transition: border-color 0.15s;
+  }
+  .capo-btn:hover { border-color: var(--tortoise); }
+  .capo-val {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 600;
+    color: var(--text-primary); min-width: 32px; text-align: center;
+  }
+  .capo-val.negative { color: #8B5A3A; }
+  .capo-val.positive { color: var(--seafoam); }
+
+  .sf-wrap {
+    display: inline-flex; align-items: center; gap: 6px;
+    cursor: pointer; user-select: none;
+  }
+  .sf-symbol {
+    font-family: var(--font-mono); font-size: 22px; font-weight: 700;
+    line-height: 1; color: var(--border); transition: color 0.2s;
+  }
+  .sf-symbol.active { color: var(--tortoise); }
+  .sf-track {
+    width: 28px; height: 14px; border-radius: 7px;
+    background: var(--border); position: relative;
+    flex-shrink: 0;
+  }
+  .sf-knob {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--tortoise);
+    position: absolute; top: 1px;
+    transition: left 0.2s ease;
+  }
+  .sf-knob.sharp { left: 15px; }
+  .sf-knob.flat  { left: 1px; }
 
   .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
   .tab {
@@ -128,10 +172,21 @@
 <div class="page">
   <div class="top-bar">
     <h1>Funk &amp; <em>New Wave</em> Scale Atlas</h1>
-    <div style="display:flex;align-items:baseline;gap:12px;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="capo-wrap">
+        <label>Capo</label>
+        <button class="capo-btn" onclick="setCapo(capoFret-1)">−</button>
+        <span class="capo-val" id="capo-val">0</span>
+        <button class="capo-btn" onclick="setCapo(capoFret+1)">+</button>
+      </div>
+      <div class="sf-wrap" onclick="toggleSharpFlat()">
+        <span class="sf-symbol" id="sf-flat">♭</span>
+        <div class="sf-track"><div class="sf-knob" id="sf-knob"></div></div>
+        <span class="sf-symbol" id="sf-sharp">♯</span>
+      </div>
       <label style="font-family:var(--font-mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--text-tertiary);">Root</label>
       <select class="root-select" id="root-select" onchange="setRoot(this.value)"></select>
-      <span class="tuning">E A D G B E · Standard</span>
+      <span class="tuning" id="tuning-label">E A D G B E · Standard</span>
     </div>
   </div>
   <nav class="tabs" id="tabs"></nav>
@@ -302,26 +357,37 @@ const NOTE_NAMES   = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 const OPEN_MIDI    = [4, 9, 2, 7, 11, 4];
 const STRING_NAMES = ['E','A','D','G','B','e'];
 const FRET_COUNT   = 17;
+var capoFret = 0;
 
 function noteClass(n) {
   const map = { Bb:'A#', Db:'C#', Eb:'D#', Gb:'F#', Ab:'G#' };
   return map[n] || n;
 }
 function noteIdx(n)  { return NOTE_NAMES.indexOf(noteClass(n)); }
-function noteAtFret(si, f) { return NOTE_NAMES[(OPEN_MIDI[si] + f) % 12]; }
+function effectiveOpen(si) { return (OPEN_MIDI[si] + capoFret + 120) % 12; }
+function noteAtFret(si, f) {
+  var detuning = capoFret < 0 ? capoFret : 0;
+  return displayNotes()[(OPEN_MIDI[si] + detuning + f + 240) % 12];
+}
 function notesMatch(a, b)  { return noteClass(a) === noteClass(b); }
 function noteInSet(n, set) { return set.some(function(s){ return notesMatch(s, n); }); }
 
 // ── Transposition ──
 
-const DISPLAY_NOTES = ['C','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+const SHARP_NOTES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const FLAT_NOTES  = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+var useSharps = true;
 var activeRoot = 'E';
 var BASE_ROOT_IDX = noteIdx('E'); // all SCALES data is in E
+
+function displayNotes() {
+  return useSharps ? SHARP_NOTES : FLAT_NOTES;
+}
 
 function transposeNote(note, semitones) {
   var idx = noteIdx(note);
   if (idx === -1) return note;
-  return DISPLAY_NOTES[(idx + semitones + 120) % 12];
+  return displayNotes()[(idx + semitones + 120) % 12];
 }
 
 function parseChordRoot(name) {
@@ -462,11 +528,109 @@ const SHAPE_TEMPLATES = {
     { label:'b9',      semis:[0,4,7,10,13],     ss:[1,2,3,4,5],   span:5 },
   ],
   dim7: [
-    { label:'4-str',   semis:[0,3,6,9],         ss:[1,2,3,4],     span:4 },
-    { label:'4-str',   semis:[0,3,6,9],         ss:[2,3,4,5],     span:4 },
-    { label:'4-str',   semis:[0,3,6,9],         ss:[0,1,2,3],     span:4 },
+    { label:'4-str',   semis:[0,3,6,9],         ss:[1,2,3,4],     span:5 },
+    { label:'4-str',   semis:[0,3,6,9],         ss:[2,3,4,5],     span:5 },
+    { label:'4-str',   semis:[0,3,6,9],         ss:[0,1,2,3],     span:5 },
   ],
 };
+
+// ── Known voicings — real shapes guitarists actually play ──
+
+const KNOWN_VOICINGS = {
+  // Major open
+  'C':     [['x','3','2','0','1','0','C shape']],
+  'D':     [['x','x','0','2','3','2','D shape']],
+  'E':     [['0','2','2','1','0','0','E shape']],
+  'G':     [['3','2','0','0','0','3','G shape'], ['3','2','0','0','3','3','G shape']],
+  'A':     [['x','0','2','2','2','0','A shape']],
+  'F':     [['1','3','3','2','1','1','E barre']],
+  'B':     [['x','2','4','4','4','2','A barre']],
+  'Db':    [['x','4','6','6','6','4','A barre']],
+  'Eb':    [['x','6','8','8','8','6','A barre']],
+  'Ab':    [['4','6','6','5','4','4','E barre']],
+  'Bb':    [['x','1','3','3','3','1','A barre']],
+
+  // Minor open
+  'Am':    [['x','0','2','2','1','0','Am shape']],
+  'Dm':    [['x','x','0','2','3','1','Dm shape']],
+  'Em':    [['0','2','2','0','0','0','Em shape']],
+  'F#m':   [['2','4','4','2','2','2','Em barre']],
+  'Bm':    [['x','2','4','4','3','2','Am barre']],
+  'C#m':   [['x','4','6','6','5','4','Am barre']],
+  'Gm':    [['3','5','5','3','3','3','Em barre']],
+  'Cm':    [['x','3','5','5','4','3','Am barre']],
+  'Bbm':   [['x','1','3','3','2','1','Am barre']],
+
+  // Dominant 7th
+  'E7':    [['0','2','0','1','0','0','E7 shape']],
+  'A7':    [['x','0','2','0','2','0','A7 shape']],
+  'B7':    [['x','2','1','2','0','2','B7 shape']],
+  'D7':    [['x','x','0','2','1','2','D7 shape']],
+  'G7':    [['3','2','0','0','0','1','G7 shape']],
+  'C7':    [['x','3','2','3','1','0','C7 shape']],
+
+  // Minor 7th
+  'Em7':   [['0','2','2','0','3','0','Em7 shape'], ['0','2','0','0','0','0','Em7 shape']],
+  'Am7':   [['x','0','2','0','1','0','Am7 shape']],
+  'Dm7':   [['x','x','0','2','1','1','Dm7 shape']],
+  'Bm7':   [['x','2','4','2','3','2','Am7 barre']],
+  'F#m7':  [['2','4','2','2','2','2','Em7 barre']],
+  'C#m7':  [['x','4','6','4','5','4','Am7 barre']],
+
+  // Major 7th
+  'Cmaj7': [['x','3','2','0','0','0','Cmaj7 shape']],
+  'Dmaj7': [['x','x','0','2','2','2','Dmaj7 shape']],
+  'Emaj7': [['0','2','1','1','0','0','Emaj7 shape']],
+  'Gmaj7': [['3','2','0','0','0','2','Gmaj7 shape']],
+  'Amaj7': [['x','0','2','1','2','0','Amaj7 shape']],
+  'Fmaj7': [['x','x','3','2','1','0','Fmaj7 shape'], ['1','3','3','2','1','0','Fmaj7 shape']],
+
+  // 9th / extensions
+  'E9':    [['0','2','0','1','0','2','E9 shape']],
+  'A9':    [['x','0','2','4','2','3','A9 shape']],
+  'Em9':   [['0','2','0','0','0','2','Em9 shape']],
+
+  // Hendrix chord
+  'E7#9':  [['0','2','0','1','3','3','Hendrix shape']],
+};
+
+function knownToPosition(entry) {
+  var strings = entry.slice(0, 6);
+  var sublabel = entry[6];
+  var assignment = [];
+  var playedFrets = [];
+  // Shift known voicings by capo: fret numbers become relative to capo
+  var shifted = [];
+  for (var s = 0; s < 6; s++) {
+    if (strings[s] === 'x') { shifted.push('x'); continue; }
+    var f = parseInt(strings[s]) + Math.max(0, capoFret);
+    shifted.push(String(f));
+  }
+  // For positive capo, known voicings with open strings (fret 0) become played at the capo fret
+  for (var s = 0; s < 6; s++) {
+    if (shifted[s] !== 'x') {
+      var f = parseInt(shifted[s]);
+      playedFrets.push(f);
+      assignment.push({ string: s, fret: f, note: noteAtFret(s, f) });
+    }
+  }
+  var minF = playedFrets.length ? Math.min.apply(null, playedFrets) : 0;
+  var maxF = playedFrets.length ? Math.max.apply(null, playedFrets) : 0;
+  if (maxF > FRET_COUNT) return null;
+  var capoMin = Math.max(0, capoFret);
+  var dispLabel;
+  if (minF <= capoMin) dispLabel = 'Open';
+  else dispLabel = 'Fr ' + minF;
+  return {
+    sig: shifted.join(','),
+    label: dispLabel,
+    sublabel: sublabel,
+    strings: shifted,
+    assignment: assignment,
+    minFret: minF,
+    maxFret: maxF,
+  };
+}
 
 function generatePositions(chordName, rootNote, shapeName) {
   var templates = SHAPE_TEMPLATES[shapeName];
@@ -475,12 +639,26 @@ function generatePositions(chordName, rootNote, shapeName) {
   if (rootPc === -1) return [];
   var positions = [];
 
+  var capoMin = Math.max(0, capoFret);
+
+  // Inject known voicings (only valid for standard tuning / positive capo)
+  if (capoFret >= 0) {
+    var known = KNOWN_VOICINGS[chordName];
+    if (known) {
+      for (var ki = 0; ki < known.length; ki++) {
+        var kp = knownToPosition(known[ki]);
+        if (kp) positions.push(kp);
+      }
+    }
+  }
+
   for (var t = 0; t < templates.length; t++) {
     var tmpl = templates[t];
     var loStr  = tmpl.ss[0];
-    var openPc = OPEN_MIDI[loStr];
+    var detuning = capoFret < 0 ? capoFret : 0;
+    var openPc = (OPEN_MIDI[loStr] + detuning + 240) % 12;
 
-    for (var rootFret = 0; rootFret <= FRET_COUNT; rootFret++) {
+    for (var rootFret = capoMin; rootFret <= FRET_COUNT; rootFret++) {
       if ((openPc + rootFret) % 12 !== rootPc) continue;
       var assignment = [];
       var valid = true;
@@ -488,11 +666,12 @@ function generatePositions(chordName, rootNote, shapeName) {
       for (var i = 0; i < tmpl.ss.length; i++) {
         var s        = tmpl.ss[i];
         var targetPc = (rootPc + tmpl.semis[i]) % 12;
-        var openS    = OPEN_MIDI[s];
+        var openS    = (OPEN_MIDI[s] + detuning + 240) % 12;
         var fret = (targetPc - openS + 12) % 12;
         while (fret < rootFret - tmpl.span) fret += 12;
+        if (fret < capoMin) fret += 12;
         if (fret > FRET_COUNT) { valid = false; break; }
-        assignment.push({ string: s, fret: fret, note: NOTE_NAMES[targetPc] });
+        assignment.push({ string: s, fret: fret, note: displayNotes()[targetPc] });
       }
       if (!valid) continue;
 
@@ -501,6 +680,7 @@ function generatePositions(chordName, rootNote, shapeName) {
       var maxF  = Math.max.apply(null, frets);
       if (maxF - minF > tmpl.span) continue;
       if (maxF > FRET_COUNT) continue;
+      if (minF < capoMin) continue;
 
       var strArr = ['x','x','x','x','x','x'];
       for (var j = 0; j < assignment.length; j++) strArr[assignment[j].string] = String(assignment[j].fret);
@@ -510,9 +690,13 @@ function generatePositions(chordName, rootNote, shapeName) {
       for (var k = 0; k < positions.length; k++) { if (positions[k].sig === sig) { dup = true; break; } }
       if (dup) continue;
 
+      var dispLabel;
+      if (minF <= capoMin) dispLabel = 'Open';
+      else dispLabel = 'Fr ' + minF;
+
       positions.push({
         sig: sig,
-        label:    minF === 0 ? 'Open' : 'Fr ' + minF,
+        label:    dispLabel,
         sublabel: tmpl.label,
         strings:  strArr,
         assignment: assignment,
@@ -579,7 +763,8 @@ function renderFretboard(scale) {
     var sw = (0.7 + (5-s)*0.22);
     var so = (0.3 + (5-s)*0.06);
     svg += `<line x1="32" y1="${STRING_Y[s]}" x2="${w-8}" y2="${STRING_Y[s]}" stroke="rgba(200,180,150,${so})" stroke-width="${sw}"/>`;
-    svg += `<text x="16" y="${STRING_Y[s]+1}" text-anchor="middle" dominant-baseline="central" font-size="12" fill="rgba(255,255,255,0.4)" font-family="var(--font-mono)" font-weight="500">${STRING_NAMES[s]}</text>`;
+    var stringNote = displayNotes()[(OPEN_MIDI[s] + capoFret + 240) % 12];
+    svg += `<text x="16" y="${STRING_Y[s]+1}" text-anchor="middle" dominant-baseline="central" font-size="12" fill="rgba(255,255,255,0.4)" font-family="var(--font-mono)" font-weight="500">${stringNote}</text>`;
   }
 
   // Fret lines
@@ -594,30 +779,44 @@ function renderFretboard(scale) {
     if (m > FRET_COUNT) continue;
     var mx = FB_PAD_LEFT + (m-0.5)*FB_FRET_W;
     if (m === 12) {
-      svg += `<circle cx="${mx-7}" cy="${my}" r="2.5" fill="rgba(255,255,255,0.2)"/>`;
-      svg += `<circle cx="${mx+7}" cy="${my}" r="2.5" fill="rgba(255,255,255,0.2)"/>`;
+      svg += `<circle cx="${mx-7}" cy="${my}" r="2.5" fill="rgba(255,255,255,0.35)"/>`;
+      svg += `<circle cx="${mx+7}" cy="${my}" r="2.5" fill="rgba(255,255,255,0.35)"/>`;
     } else {
-      svg += `<circle cx="${mx}" cy="${my}" r="2.5" fill="rgba(255,255,255,0.2)"/>`;
+      svg += `<circle cx="${mx}" cy="${my}" r="2.5" fill="rgba(255,255,255,0.35)"/>`;
     }
-    svg += `<text x="${mx}" y="${my+14}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.25)" font-family="var(--font-mono)">${m}</text>`;
+    svg += `<text x="${mx}" y="${my+14}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.4)" font-family="var(--font-mono)">${m}</text>`;
   }
 
   var rootCol = '#D4614A';
   var toneCol = '#6AAF96';
+  var capoMin = Math.max(0, capoFret);
 
-  // Open string dots
-  for (var s = 0; s < 6; s++) {
-    var n = NOTE_NAMES[OPEN_MIDI[s]];
-    if (!noteInSet(n, scale.notes)) continue;
-    var col = notesMatch(n, scale.root) ? rootCol : toneCol;
-    svg += `<circle cx="40" cy="${STRING_Y[s]}" r="${FB_DOT_R}" fill="${col}" class="note-dot" data-note="${n}" data-string="${s}" data-fret="0" style="cursor:pointer;"/>`;
-    svg += `<text x="40" y="${STRING_Y[s]+0.5}" text-anchor="middle" dominant-baseline="central" font-size="${FB_FONT}" fill="#fff" font-family="var(--font-mono)" font-weight="600" style="pointer-events:none;">${n}</text>`;
+  // Shade frets behind capo (positive capo)
+  if (capoFret > 0) {
+    var shadeX2 = FB_PAD_LEFT + capoFret * FB_FRET_W;
+    svg += `<rect x="${FB_PAD_LEFT}" y="${topY-8}" width="${shadeX2-FB_PAD_LEFT}" height="${botY-topY+16}" fill="rgba(0,0,0,0.35)" rx="2"/>`;
+    // Capo bar
+    svg += `<rect x="${shadeX2-3}" y="${topY-10}" width="6" height="${botY-topY+20}" fill="#D4C4A8" rx="3"/>`;
+    svg += `<rect x="${shadeX2-2}" y="${topY-10}" width="4" height="${botY-topY+20}" fill="#E8DED3" rx="2"/>`;
+    svg += `<text x="${shadeX2}" y="${my+14}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.7)" font-family="var(--font-mono)" font-weight="600">C${capoFret}</text>`;
   }
 
-  // Fretted dots
+  // Open string dots (at capo position or fret 0)
+  var openFret = capoMin;
+  var openCX = openFret === 0 ? 40 : FB_PAD_LEFT + (openFret - 0.5) * FB_FRET_W;
+  for (var s = 0; s < 6; s++) {
+    var n = noteAtFret(s, openFret);
+    if (!noteInSet(n, scale.notes)) continue;
+    var col = notesMatch(n, scale.root) ? rootCol : toneCol;
+    svg += `<circle cx="${openCX}" cy="${STRING_Y[s]}" r="${FB_DOT_R}" fill="${col}" class="note-dot" data-note="${n}" data-string="${s}" data-fret="${openFret}" style="cursor:pointer;"/>`;
+    svg += `<text x="${openCX}" y="${STRING_Y[s]+0.5}" text-anchor="middle" dominant-baseline="central" font-size="${FB_FONT}" fill="#fff" font-family="var(--font-mono)" font-weight="600" style="pointer-events:none;">${n}</text>`;
+  }
+
+  // Fretted dots (skip frets behind capo)
   for (var s = 0; s < 6; s++) {
     for (var fi = 0; fi < FRET_COUNT; fi++) {
       var f = fi + 1;
+      if (f <= capoMin) continue;
       var n = noteAtFret(s, f);
       if (!noteInSet(n, scale.notes)) continue;
       var x = FB_PAD_LEFT + (fi+0.5)*FB_FRET_W;
@@ -639,24 +838,32 @@ function renderChordDiagram(strArr) {
   var sw     = 80;
   var ss     = sw / 5;
   var fs     = 16;
-  var nFrets = 5;
+  var nFrets = 6;
   var sh     = fs * nFrets;
   var sx     = 18, sy = 18;
   var labelH = 18;
   var w      = sx + sw + 22;
   var h      = sy + sh + labelH + 6;
 
+  var capoMin = Math.max(0, capoFret);
   var playedFrets = [];
-  for (var i = 0; i < 6; i++) { if (strArr[i] !== 'x' && strArr[i] !== '0') playedFrets.push(parseInt(strArr[i])); }
-  var minFret   = playedFrets.length ? Math.min.apply(null, playedFrets) : 1;
-  var startFret = minFret > 2 ? minFret : 1;
+  for (var i = 0; i < 6; i++) {
+    if (strArr[i] !== 'x') {
+      var fv = parseInt(strArr[i]);
+      if (fv > capoMin) playedFrets.push(fv);
+    }
+  }
+  var minFret   = playedFrets.length ? Math.min.apply(null, playedFrets) : (capoMin + 1);
+  var startFret = minFret > capoMin + 2 ? minFret : (capoMin + 1);
   if (playedFrets.length && Math.max.apply(null, playedFrets) - startFret > 4) startFret = minFret;
 
   var svg = '';
 
   // Nut or fret label
-  if (startFret <= 1) {
-    svg += `<line x1="${sx-2}" y1="${sy}" x2="${sx+sw+2}" y2="${sy}" stroke="var(--text-primary)" stroke-width="3" stroke-linecap="round"/>`;
+  if (startFret <= capoMin + 1) {
+    var nutLabel = capoFret > 0 ? 'C' + capoFret : '';
+    svg += `<line x1="${sx-2}" y1="${sy}" x2="${sx+sw+2}" y2="${sy}" stroke="${capoFret > 0 ? 'var(--seafoam)' : 'var(--text-primary)'}" stroke-width="3" stroke-linecap="round"/>`;
+    if (nutLabel) svg += `<text x="${sx-12}" y="${sy+fs*0.6}" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="600" fill="var(--seafoam)" font-family="var(--font-mono)">${nutLabel}</text>`;
   } else {
     svg += `<text x="${sx-12}" y="${sy+fs*0.6}" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-tertiary)" font-family="var(--font-mono)">${startFret}</text>`;
   }
@@ -680,14 +887,17 @@ function renderChordDiagram(strArr) {
 
     if (val === 'x') {
       svg += `<text x="${x}" y="${sy-8}" text-anchor="middle" font-size="12" font-weight="500" fill="var(--text-tertiary)" font-family="var(--font-mono)">\u00D7</text>`;
-    } else if (val === '0') {
-      svg += `<circle cx="${x}" cy="${sy-8}" r="4.5" fill="none" stroke="var(--text-secondary)" stroke-width="1.5"/>`;
-      svg += `<text x="${x}" y="${labelY}" text-anchor="middle" font-size="10" font-weight="500" fill="var(--text-secondary)" font-family="var(--font-mono)">0</text>`;
     } else {
       var fv = parseInt(val);
-      var fy = sy + (fv - startFret + 0.5)*fs;
-      svg += `<circle cx="${x}" cy="${fy}" r="6" fill="var(--seafoam)"/>`;
-      svg += `<text x="${x}" y="${labelY}" text-anchor="middle" font-size="10" font-weight="600" fill="var(--text-primary)" font-family="var(--font-mono)">${val}</text>`;
+      if (fv <= capoMin) {
+        // Open string (at or behind capo)
+        svg += `<circle cx="${x}" cy="${sy-8}" r="4.5" fill="none" stroke="var(--text-secondary)" stroke-width="1.5"/>`;
+        svg += `<text x="${x}" y="${labelY}" text-anchor="middle" font-size="10" font-weight="500" fill="var(--text-secondary)" font-family="var(--font-mono)">${fv}</text>`;
+      } else {
+        var fy = sy + (fv - startFret + 0.5)*fs;
+        svg += `<circle cx="${x}" cy="${fy}" r="6" fill="var(--seafoam)"/>`;
+        svg += `<text x="${x}" y="${labelY}" text-anchor="middle" font-size="10" font-weight="600" fill="var(--text-primary)" font-family="var(--font-mono)">${val}</text>`;
+      }
     }
   }
 
@@ -820,15 +1030,33 @@ window.selectPosition = function(chordName, posIdx) {
 function render() {
   // Populate root dropdown
   var rootSel = document.getElementById('root-select');
+  var dn = displayNotes();
   if (rootSel.options.length === 0) {
-    for (var i = 0; i < DISPLAY_NOTES.length; i++) {
+    for (var i = 0; i < dn.length; i++) {
       var opt = document.createElement('option');
-      opt.value = DISPLAY_NOTES[i];
-      opt.textContent = DISPLAY_NOTES[i];
+      opt.value = dn[i];
+      opt.textContent = dn[i];
       rootSel.appendChild(opt);
     }
   }
   rootSel.value = activeRoot;
+  document.getElementById('sf-knob').className = 'sf-knob ' + (useSharps ? 'sharp' : 'flat');
+  document.getElementById('sf-sharp').className = 'sf-symbol' + (useSharps ? ' active' : '');
+  document.getElementById('sf-flat').className = 'sf-symbol' + (useSharps ? '' : ' active');
+
+  // Capo display
+  var capoEl = document.getElementById('capo-val');
+  capoEl.textContent = capoFret === 0 ? '0' : (capoFret > 0 ? '+' + capoFret : String(capoFret));
+  capoEl.className = 'capo-val' + (capoFret < 0 ? ' negative' : capoFret > 0 ? ' positive' : '');
+
+  // Tuning label
+  var tuningNotes = [];
+  for (var i = 0; i < 6; i++) {
+    tuningNotes.push(dn[(OPEN_MIDI[i] + capoFret + 120) % 12]);
+  }
+  var tuningStr = tuningNotes.join(' ');
+  var tuningDesc = capoFret === 0 ? 'Standard' : (capoFret > 0 ? 'Capo ' + capoFret : 'Drop ' + Math.abs(capoFret));
+  document.getElementById('tuning-label').textContent = tuningStr + ' · ' + tuningDesc;
 
   var semitones = (noteIdx(activeRoot) - BASE_ROOT_IDX + 12) % 12;
 
@@ -969,8 +1197,39 @@ function render() {
   }
 }
 
-window.setTab = function(id) { activeTab = id; render(); };
-window.setRoot = function(note) { activeRoot = note; render(); };
+function savePrefs() {
+  localStorage.setItem('scaleAtlas', JSON.stringify({
+    tab: activeTab, root: activeRoot, capo: capoFret, sharps: useSharps
+  }));
+}
+function loadPrefs() {
+  try {
+    var p = JSON.parse(localStorage.getItem('scaleAtlas'));
+    if (!p) return;
+    if (p.tab) activeTab = p.tab;
+    if (p.root) activeRoot = p.root;
+    if (typeof p.capo === 'number') capoFret = p.capo;
+    if (typeof p.sharps === 'boolean') useSharps = p.sharps;
+  } catch(e) {}
+}
+
+window.setTab = function(id) { activeTab = id; savePrefs(); render(); };
+window.setRoot = function(note) { activeRoot = note; savePrefs(); render(); };
+window.setCapo = function(n) {
+  if (n < -5 || n > 12) return;
+  capoFret = n;
+  savePrefs();
+  render();
+};
+window.toggleSharpFlat = function() {
+  useSharps = !useSharps;
+  var idx = noteIdx(activeRoot);
+  activeRoot = displayNotes()[idx];
+  document.getElementById('root-select').innerHTML = '';
+  savePrefs();
+  render();
+};
+loadPrefs();
 render();
 </script>
 </body>
