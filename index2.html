@@ -128,10 +128,12 @@
 <div class="page">
   <div class="top-bar">
     <h1>Funk &amp; <em>New Wave</em> Scale Atlas</h1>
-    <div style="display:flex;align-items:baseline;gap:12px;">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
       <label style="font-family:var(--font-mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--text-tertiary);">Root</label>
       <select class="root-select" id="root-select" onchange="setRoot(this.value)"></select>
-      <span class="tuning">E A D G B E · Standard</span>
+      <label style="font-family:var(--font-mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--text-tertiary);">Tuning</label>
+      <select class="root-select" id="tuning-select" onchange="setTuning(this.value)"></select>
+      <span class="tuning" id="tuning-label">E A D G B E · Standard</span>
     </div>
   </div>
   <nav class="tabs" id="tabs"></nav>
@@ -296,6 +298,21 @@ const SCALES = [
 ];
 
 // ══════════════════════════════════════════════════════
+//  TUNINGS
+// ══════════════════════════════════════════════════════
+
+var TUNINGS = {
+  'guitar':       { name: 'Guitar (Standard)',  short: 'Standard',      strings: ['E','A','D','G','B','e'],  midi: [4,9,2,7,11,4],   frets: 17 },
+  'drop-d':       { name: 'Guitar (Drop D)',    short: 'Drop D',        strings: ['D','A','D','G','B','e'],  midi: [2,9,2,7,11,4],   frets: 17 },
+  'baritone':     { name: 'Baritone Guitar',    short: 'Baritone',      strings: ['B','E','A','D','F#','B'], midi: [11,4,9,2,6,11],  frets: 17 },
+  'ukulele':      { name: 'Ukulele (GCEA)',     short: 'Ukulele',       strings: ['G','C','E','A'],          midi: [7,0,4,9],        frets: 15 },
+  'tenor-uke':    { name: 'Tenor Uke (DGBE)',   short: 'Tenor Uke',     strings: ['D','G','B','E'],          midi: [2,7,11,4],       frets: 17 },
+  'bass':         { name: 'Bass (EADG)',        short: 'Bass',          strings: ['E','A','D','G'],          midi: [4,9,2,7],        frets: 17 },
+  'banjo':        { name: '5-String Banjo',     short: 'Banjo',         strings: ['g','D','G','B','D'],      midi: [7,2,7,11,2],     frets: 17 },
+};
+var activeTuning = 'guitar';
+
+// ══════════════════════════════════════════════════════
 //  THEORY ENGINE  (powered by Tonal.js)
 // ══════════════════════════════════════════════════════
 
@@ -304,10 +321,13 @@ var Interval = Tonal.Interval;
 var TChord   = Tonal.Chord;
 var TScale   = Tonal.Scale;
 
-const NOTE_NAMES   = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
-const OPEN_MIDI    = [4, 9, 2, 7, 11, 4];
-const STRING_NAMES = ['E','A','D','G','B','e'];
-const FRET_COUNT   = 17;
+const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+
+// Dynamic tuning state — these get updated by setTuning()
+var OPEN_MIDI    = TUNINGS.guitar.midi;
+var STRING_NAMES = TUNINGS.guitar.strings;
+var FRET_COUNT   = TUNINGS.guitar.frets;
+var STRING_COUNT = TUNINGS.guitar.strings.length;
 
 // ── Core note helpers (Tonal-powered) ──
 
@@ -470,12 +490,177 @@ const SHAPE_TEMPLATES = {
   ],
 };
 
+// ── 4-string shapes (ukulele, tenor uke, bass) ──
+
+var SHAPE_TEMPLATES_4 = {
+  power5: [
+    { label:'5th',    semis:[0,7],              ss:[0,1], span:3 },
+    { label:'5th',    semis:[0,7],              ss:[1,2], span:3 },
+    { label:'5th',    semis:[0,7],              ss:[2,3], span:3 },
+  ],
+  major: [
+    { label:'Full',   semis:[0,4,7,12],         ss:[0,1,2,3], span:5 },
+    { label:'Full',   semis:[0,7,12,16],         ss:[0,1,2,3], span:5 },
+    { label:'Triad',  semis:[0,4,7],            ss:[0,1,2],   span:5 },
+    { label:'Triad',  semis:[0,4,7],            ss:[1,2,3],   span:5 },
+  ],
+  minor: [
+    { label:'Full',   semis:[0,3,7,12],         ss:[0,1,2,3], span:5 },
+    { label:'Full',   semis:[0,7,12,15],         ss:[0,1,2,3], span:5 },
+    { label:'Triad',  semis:[0,3,7],            ss:[0,1,2],   span:5 },
+    { label:'Triad',  semis:[0,3,7],            ss:[1,2,3],   span:5 },
+  ],
+  maj7: [
+    { label:'Full',   semis:[0,4,7,11],         ss:[0,1,2,3], span:5 },
+    { label:'Full',   semis:[0,7,11,16],         ss:[0,1,2,3], span:5 },
+    { label:'3-str',  semis:[0,4,11],           ss:[0,1,2],   span:5 },
+    { label:'3-str',  semis:[0,7,11],           ss:[1,2,3],   span:5 },
+  ],
+  minor7: [
+    { label:'Full',   semis:[0,3,7,10],         ss:[0,1,2,3], span:5 },
+    { label:'Full',   semis:[0,7,10,15],         ss:[0,1,2,3], span:5 },
+    { label:'3-str',  semis:[0,3,10],           ss:[0,1,2],   span:5 },
+    { label:'3-str',  semis:[0,7,10],           ss:[1,2,3],   span:5 },
+  ],
+  dom7: [
+    { label:'Full',   semis:[0,4,7,10],         ss:[0,1,2,3], span:5 },
+    { label:'Full',   semis:[0,7,10,16],         ss:[0,1,2,3], span:5 },
+    { label:'3-str',  semis:[0,4,10],           ss:[0,1,2],   span:5 },
+    { label:'3-str',  semis:[0,7,10],           ss:[1,2,3],   span:5 },
+  ],
+  dom9: [
+    { label:'Full',   semis:[0,4,10,14],        ss:[0,1,2,3], span:5 },
+    { label:'Full',   semis:[0,10,14,16],        ss:[0,1,2,3], span:5 },
+  ],
+  dom13: [
+    { label:'Full',   semis:[0,10,16,21],        ss:[0,1,2,3], span:5 },
+  ],
+  maj6: [
+    { label:'Full',   semis:[0,4,7,9],          ss:[0,1,2,3], span:5 },
+    { label:'3-str',  semis:[0,7,9],            ss:[1,2,3],   span:5 },
+  ],
+  maj9: [
+    { label:'Full',   semis:[0,4,11,14],        ss:[0,1,2,3], span:5 },
+    { label:'Full',   semis:[0,7,11,14],        ss:[0,1,2,3], span:5 },
+  ],
+  minor9: [
+    { label:'Full',   semis:[0,3,10,14],        ss:[0,1,2,3], span:5 },
+    { label:'Full',   semis:[0,10,14,15],        ss:[0,1,2,3], span:5 },
+  ],
+  add9: [
+    { label:'Full',   semis:[0,4,7,14],         ss:[0,1,2,3], span:5 },
+    { label:'3-str',  semis:[0,7,14],           ss:[1,2,3],   span:5 },
+  ],
+  dom7sus4: [
+    { label:'Full',   semis:[0,5,7,10],         ss:[0,1,2,3], span:5 },
+  ],
+  dom7s9: [
+    { label:'Full',   semis:[0,4,10,15],        ss:[0,1,2,3], span:5 },
+  ],
+  dom7b9: [
+    { label:'Full',   semis:[0,4,10,13],        ss:[0,1,2,3], span:5 },
+  ],
+  dim7: [
+    { label:'Full',   semis:[0,3,6,9],          ss:[0,1,2,3], span:4 },
+    { label:'3-str',  semis:[0,3,6],            ss:[0,1,2],   span:4 },
+    { label:'3-str',  semis:[0,3,6],            ss:[1,2,3],   span:4 },
+  ],
+};
+
+// ── 5-string shapes (banjo) ──
+
+var SHAPE_TEMPLATES_5 = {
+  power5: [
+    { label:'5th',    semis:[0,7],              ss:[0,1], span:3 },
+    { label:'5th',    semis:[0,7],              ss:[1,2], span:3 },
+    { label:'5th',    semis:[0,7],              ss:[2,3], span:3 },
+    { label:'5th',    semis:[0,7],              ss:[3,4], span:3 },
+  ],
+  major: [
+    { label:'Full',   semis:[0,4,7,12,16],      ss:[0,1,2,3,4], span:5 },
+    { label:'Full',   semis:[0,7,12,16,19],      ss:[0,1,2,3,4], span:5 },
+    { label:'4-str',  semis:[0,7,12,16],        ss:[1,2,3,4],   span:4 },
+    { label:'Triad',  semis:[0,4,7],            ss:[0,1,2],     span:5 },
+    { label:'Triad',  semis:[0,4,7],            ss:[2,3,4],     span:5 },
+  ],
+  minor: [
+    { label:'Full',   semis:[0,3,7,12,15],      ss:[0,1,2,3,4], span:5 },
+    { label:'Full',   semis:[0,7,12,15,19],      ss:[0,1,2,3,4], span:5 },
+    { label:'4-str',  semis:[0,7,12,15],        ss:[1,2,3,4],   span:4 },
+    { label:'Triad',  semis:[0,3,7],            ss:[0,1,2],     span:5 },
+    { label:'Triad',  semis:[0,3,7],            ss:[2,3,4],     span:5 },
+  ],
+  maj7: [
+    { label:'Full',   semis:[0,4,7,11,16],      ss:[0,1,2,3,4], span:5 },
+    { label:'4-str',  semis:[0,7,11,16],        ss:[1,2,3,4],   span:5 },
+    { label:'4-str',  semis:[0,4,7,11],         ss:[0,1,2,3],   span:5 },
+  ],
+  minor7: [
+    { label:'Full',   semis:[0,3,7,10,15],      ss:[0,1,2,3,4], span:5 },
+    { label:'4-str',  semis:[0,7,10,15],        ss:[1,2,3,4],   span:4 },
+    { label:'4-str',  semis:[0,3,7,10],         ss:[0,1,2,3],   span:5 },
+  ],
+  dom7: [
+    { label:'Full',   semis:[0,4,7,10,16],      ss:[0,1,2,3,4], span:5 },
+    { label:'4-str',  semis:[0,7,10,16],        ss:[1,2,3,4],   span:4 },
+    { label:'4-str',  semis:[0,4,7,10],         ss:[0,1,2,3],   span:5 },
+  ],
+  dom9: [
+    { label:'Full',   semis:[0,7,10,14,16],     ss:[0,1,2,3,4], span:5 },
+    { label:'4-str',  semis:[0,10,14,16],       ss:[1,2,3,4],   span:5 },
+  ],
+  dom13: [
+    { label:'Full',   semis:[0,7,10,16,21],     ss:[0,1,2,3,4], span:5 },
+  ],
+  maj6: [
+    { label:'4-str',  semis:[0,7,9,16],         ss:[1,2,3,4],   span:5 },
+    { label:'4-str',  semis:[0,4,7,9],          ss:[0,1,2,3],   span:5 },
+  ],
+  maj9: [
+    { label:'Full',   semis:[0,7,11,14,16],     ss:[0,1,2,3,4], span:5 },
+  ],
+  minor9: [
+    { label:'Full',   semis:[0,7,10,14,15],     ss:[0,1,2,3,4], span:5 },
+    { label:'4-str',  semis:[0,10,14,15],       ss:[1,2,3,4],   span:5 },
+  ],
+  add9: [
+    { label:'4-str',  semis:[0,7,12,14],        ss:[1,2,3,4],   span:5 },
+    { label:'4-str',  semis:[0,4,7,14],         ss:[0,1,2,3],   span:5 },
+  ],
+  dom7sus4: [
+    { label:'4-str',  semis:[0,5,7,10],         ss:[0,1,2,3],   span:5 },
+    { label:'4-str',  semis:[0,5,7,10],         ss:[1,2,3,4],   span:5 },
+  ],
+  dom7s9: [
+    { label:'Full',   semis:[0,4,7,10,15],      ss:[0,1,2,3,4], span:5 },
+    { label:'4-str',  semis:[0,4,10,15],        ss:[1,2,3,4],   span:5 },
+  ],
+  dom7b9: [
+    { label:'Full',   semis:[0,4,7,10,13],      ss:[0,1,2,3,4], span:5 },
+    { label:'4-str',  semis:[0,4,10,13],        ss:[1,2,3,4],   span:5 },
+  ],
+  dim7: [
+    { label:'4-str',  semis:[0,3,6,9],          ss:[1,2,3,4],   span:4 },
+    { label:'4-str',  semis:[0,3,6,9],          ss:[0,1,2,3],   span:4 },
+  ],
+};
+
+// ── Shape lookup by string count ──
+
+function getShapeTemplates() {
+  if (STRING_COUNT <= 4) return SHAPE_TEMPLATES_4;
+  if (STRING_COUNT === 5) return SHAPE_TEMPLATES_5;
+  return SHAPE_TEMPLATES;
+}
+
 function generatePositions(chordName, rootNote, shapeName) {
-  var templates = SHAPE_TEMPLATES[shapeName];
+  var shapes = getShapeTemplates();
+  var templates = shapes[shapeName];
   if (!templates) return [];
   var rootPc = noteIdx(rootNote);
   if (rootPc === -1) return [];
   var positions = [];
+  var sc = STRING_COUNT;
 
   for (var t = 0; t < templates.length; t++) {
     var tmpl = templates[t];
@@ -489,6 +674,7 @@ function generatePositions(chordName, rootNote, shapeName) {
 
       for (var i = 0; i < tmpl.ss.length; i++) {
         var s        = tmpl.ss[i];
+        if (s >= sc) { valid = false; break; }
         var targetPc = (rootPc + tmpl.semis[i]) % 12;
         var openS    = OPEN_MIDI[s];
         var fret = (targetPc - openS + 12) % 12;
@@ -504,7 +690,8 @@ function generatePositions(chordName, rootNote, shapeName) {
       if (maxF - minF > tmpl.span) continue;
       if (maxF > FRET_COUNT) continue;
 
-      var strArr = ['x','x','x','x','x','x'];
+      var strArr = [];
+      for (var si = 0; si < sc; si++) strArr.push('x');
       for (var j = 0; j < assignment.length; j++) strArr[assignment[j].string] = String(assignment[j].fret);
 
       var sig = strArr.join(',');
@@ -534,10 +721,10 @@ function generatePositions(chordName, rootNote, shapeName) {
       if (i === j || dominated[j]) continue;
       var a = positions[i].strings, b = positions[j].strings;
       var aC = 0, bC = 0;
-      for (var s = 0; s < 6; s++) { if (a[s] !== 'x') aC++; if (b[s] !== 'x') bC++; }
+      for (var s = 0; s < sc; s++) { if (a[s] !== 'x') aC++; if (b[s] !== 'x') bC++; }
       if (aC >= bC) continue;
       var isSub = true;
-      for (var s = 0; s < 6; s++) { if (a[s] !== 'x' && a[s] !== b[s]) { isSub = false; break; } }
+      for (var s = 0; s < sc; s++) { if (a[s] !== 'x' && a[s] !== b[s]) { isSub = false; break; } }
       if (isSub) dominated[i] = true;
     }
   }
@@ -548,7 +735,7 @@ function generatePositions(chordName, rootNote, shapeName) {
 }
 
 // ══════════════════════════════════════════════════════
-//  FRETBOARD
+//  FRETBOARD (dynamic string count)
 // ══════════════════════════════════════════════════════
 
 var FB_PAD_LEFT   = 48;
@@ -558,15 +745,21 @@ var FB_DOT_R      = 9;
 var FB_FONT       = 11;
 var FB_TOP        = 14;
 var STRING_Y = [];
-for (var i = 0; i < 6; i++) STRING_Y.push(FB_TOP + (5 - i) * FB_STRING_GAP);
+
+function rebuildStringY() {
+  STRING_Y = [];
+  for (var i = 0; i < STRING_COUNT; i++) STRING_Y.push(FB_TOP + (STRING_COUNT - 1 - i) * FB_STRING_GAP);
+}
+rebuildStringY();
 
 function dotCX(fret) {
   return fret === 0 ? 40 : FB_PAD_LEFT + (fret - 0.5) * FB_FRET_W;
 }
 
 function renderFretboard(scale) {
+  var sc   = STRING_COUNT;
   var w    = FB_PAD_LEFT + FRET_COUNT * FB_FRET_W + 20;
-  var topY = STRING_Y[5];
+  var topY = STRING_Y[sc - 1];
   var botY = STRING_Y[0];
   var h    = botY + 38;
   var markers = [3, 5, 7, 9, 12, 15, 17];
@@ -577,9 +770,9 @@ function renderFretboard(scale) {
   svg += `<line x1="${FB_PAD_LEFT}" y1="${topY-5}" x2="${FB_PAD_LEFT}" y2="${botY+5}" stroke="#D4C4A8" stroke-width="4"/>`;
 
   // Strings + labels
-  for (var s = 0; s < 6; s++) {
-    var sw = (0.7 + (5-s)*0.22);
-    var so = (0.3 + (5-s)*0.06);
+  for (var s = 0; s < sc; s++) {
+    var sw = (0.7 + (sc-1-s)*0.22);
+    var so = (0.3 + (sc-1-s)*0.06);
     svg += `<line x1="32" y1="${STRING_Y[s]}" x2="${w-8}" y2="${STRING_Y[s]}" stroke="rgba(200,180,150,${so})" stroke-width="${sw}"/>`;
     svg += `<text x="16" y="${STRING_Y[s]+1}" text-anchor="middle" dominant-baseline="central" font-size="12" fill="rgba(255,255,255,0.4)" font-family="var(--font-mono)" font-weight="500">${STRING_NAMES[s]}</text>`;
   }
@@ -608,7 +801,7 @@ function renderFretboard(scale) {
   var toneCol = '#6AAF96';
 
   // Open string dots
-  for (var s = 0; s < 6; s++) {
+  for (var s = 0; s < sc; s++) {
     var n = NOTE_NAMES[OPEN_MIDI[s]];
     if (!noteInSet(n, scale.notes)) continue;
     var col = notesMatch(n, scale.root) ? rootCol : toneCol;
@@ -617,7 +810,7 @@ function renderFretboard(scale) {
   }
 
   // Fretted dots
-  for (var s = 0; s < 6; s++) {
+  for (var s = 0; s < sc; s++) {
     for (var fi = 0; fi < FRET_COUNT; fi++) {
       var f = fi + 1;
       var n = noteAtFret(s, f);
@@ -630,7 +823,8 @@ function renderFretboard(scale) {
     }
   }
 
-  return `<svg id="fretboard-svg" width="100%" viewBox="0 0 ${w} ${h}" style="min-width:860px;">${svg}<g id="chord-overlay" style="pointer-events:none;"></g></svg>`;
+  var minW = sc <= 4 ? 700 : 860;
+  return `<svg id="fretboard-svg" width="100%" viewBox="0 0 ${w} ${h}" style="min-width:${minW}px;">${svg}<g id="chord-overlay" style="pointer-events:none;"></g></svg>`;
 }
 
 // ══════════════════════════════════════════════════════
@@ -638,8 +832,9 @@ function renderFretboard(scale) {
 // ══════════════════════════════════════════════════════
 
 function renderChordDiagram(strArr) {
-  var sw     = 80;
-  var ss     = sw / 5;
+  var sc     = strArr.length;
+  var sw     = sc <= 4 ? 48 : (sc === 5 ? 64 : 80);
+  var ss     = sw / (sc - 1);
   var fs     = 16;
   var nFrets = 5;
   var sh     = fs * nFrets;
@@ -649,7 +844,7 @@ function renderChordDiagram(strArr) {
   var h      = sy + sh + labelH + 6;
 
   var playedFrets = [];
-  for (var i = 0; i < 6; i++) { if (strArr[i] !== 'x' && strArr[i] !== '0') playedFrets.push(parseInt(strArr[i])); }
+  for (var i = 0; i < sc; i++) { if (strArr[i] !== 'x' && strArr[i] !== '0') playedFrets.push(parseInt(strArr[i])); }
   var minFret   = playedFrets.length ? Math.min.apply(null, playedFrets) : 1;
   var startFret = minFret > 2 ? minFret : 1;
   if (playedFrets.length && Math.max.apply(null, playedFrets) - startFret > 4) startFret = minFret;
@@ -670,12 +865,12 @@ function renderChordDiagram(strArr) {
   }
 
   // String lines
-  for (var i = 0; i < 6; i++) {
-    svg += `<line x1="${sx+i*ss}" y1="${sy}" x2="${sx+i*ss}" y2="${sy+sh}" stroke="#B8A898" stroke-width="${1.6-i*0.12}"/>`;
+  for (var i = 0; i < sc; i++) {
+    svg += `<line x1="${sx+i*ss}" y1="${sy}" x2="${sx+i*ss}" y2="${sy+sh}" stroke="#B8A898" stroke-width="${1.6-i*(0.7/sc)}"/>`;
   }
 
   // Dots + fret labels below
-  for (var i = 0; i < 6; i++) {
+  for (var i = 0; i < sc; i++) {
     var x = sx + i*ss;
     var labelY = sy + sh + 14;
     var val = strArr[i];
@@ -832,6 +1027,23 @@ function render() {
   }
   rootSel.value = activeRoot;
 
+  // Populate tuning dropdown
+  var tuneSel = document.getElementById('tuning-select');
+  if (tuneSel.options.length === 0) {
+    var keys = Object.keys(TUNINGS);
+    for (var i = 0; i < keys.length; i++) {
+      var opt = document.createElement('option');
+      opt.value = keys[i];
+      opt.textContent = TUNINGS[keys[i]].name;
+      tuneSel.appendChild(opt);
+    }
+  }
+  tuneSel.value = activeTuning;
+
+  // Update tuning label
+  var t = TUNINGS[activeTuning];
+  document.getElementById('tuning-label').textContent = t.strings.join(' ') + ' \u00B7 ' + t.short;
+
   var semitones = (noteIdx(activeRoot) - BASE_ROOT_IDX + 12) % 12;
 
   var tabsHTML = '';
@@ -854,7 +1066,7 @@ function render() {
       var pos = generatePositions(chord.name, chord.tones[0], chord.shape);
       window.__positions[chord.name] = pos.length ? pos : [{
         sig:'fallback', label:'\u2013', sublabel:'\u2013',
-        strings: ['x','x','x','x','x','x'], assignment:[], minFret:0, maxFret:0,
+        strings: Array(STRING_COUNT).fill('x'), assignment:[], minFret:0, maxFret:0,
       }];
       if (!(chord.name in cardPosState)) cardPosState[chord.name] = 0;
     }
@@ -973,6 +1185,18 @@ function render() {
 
 window.setTab = function(id) { activeTab = id; render(); };
 window.setRoot = function(note) { activeRoot = note; render(); };
+window.setTuning = function(key) {
+  var t = TUNINGS[key];
+  if (!t) return;
+  activeTuning = key;
+  OPEN_MIDI    = t.midi;
+  STRING_NAMES = t.strings;
+  FRET_COUNT   = t.frets;
+  STRING_COUNT = t.strings.length;
+  cardPosState = {};
+  rebuildStringY();
+  render();
+};
 render();
 </script>
 </body>
