@@ -118,8 +118,24 @@
 
   .fretboard-wrap { background: var(--fretboard-bg); border-radius: 8px; padding: 14px 16px 8px; overflow-x: auto; margin-bottom: 8px; }
 
-  .interval-row { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
-  .interval-tag { font-family: var(--font-mono); font-size: 12px; padding: 2px 10px; border-radius: 4px; background: var(--bg-warm); color: var(--text-secondary); border: 1px solid var(--border); }
+  .pos-bar { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; align-items: center; }
+  .pos-bar-label {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-tertiary); margin-right: 4px;
+  }
+  .pos-btn {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+    padding: 3px 10px; border-radius: 5px; border: 1.5px solid var(--border);
+    background: transparent; color: var(--text-tertiary); cursor: pointer;
+    transition: all 0.15s;
+  }
+  .pos-btn:hover { border-color: var(--tortoise); color: var(--text-secondary); }
+  .pos-btn.active { background: var(--tortoise); color: #FFF8F0; border-color: var(--tortoise); }
+  .pos-btn .pos-frets {
+    font-size: 9px; color: var(--text-tertiary); margin-left: 3px; font-weight: 400;
+  }
+  .pos-btn.active .pos-frets { color: rgba(255,248,240,0.6); }
+
 
   .chords-strip { width: 100%; padding: 8px 28px 16px; }
   .chords-strip-label { font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--text-tertiary); margin-bottom: 4px; }
@@ -970,6 +986,7 @@ function renderFretboard(scale) {
   var rootCol = '#D4614A';
   var toneCol = '#6AAF96';
   var capoMin = Math.max(0, capoFret);
+  var posBox = (activePosition >= 0 && activePosition < scalePositions.length) ? scalePositions[activePosition] : null;
 
   function dotLabel(note) {
     if (!showIntervals) return note;
@@ -977,6 +994,10 @@ function renderFretboard(scale) {
       if (notesMatch(scale.notes[i], note)) return scale.intervals[i];
     }
     return note;
+  }
+  function fretInBox(f) {
+    if (!posBox) return true;
+    return f >= posBox.lo && f <= posBox.hi;
   }
   var lblFont = showIntervals ? FB_FONT - 1 : FB_FONT;
 
@@ -990,15 +1011,24 @@ function renderFretboard(scale) {
     svg += `<text x="${shadeX2}" y="${my+14}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.7)" font-family="var(--font-mono)" font-weight="600">C${capoFret}</text>`;
   }
 
+  // Position box highlight
+  if (posBox) {
+    var boxX1 = posBox.lo === 0 ? 28 : FB_PAD_LEFT + (posBox.lo - 1) * FB_FRET_W + 2;
+    var boxX2 = FB_PAD_LEFT + (posBox.hi - 0.5) * FB_FRET_W + FB_DOT_R + 4;
+    svg += `<rect x="${boxX1}" y="${topY-10}" width="${boxX2-boxX1}" height="${botY-topY+20}" fill="rgba(90,158,132,0.08)" stroke="rgba(90,158,132,0.35)" stroke-width="1.5" rx="4" stroke-dasharray="4,3"/>`;
+  }
+
   // Open string dots (at capo position or fret 0)
   var openFret = capoMin;
   var openCX = openFret === 0 ? 40 : FB_PAD_LEFT + (openFret - 0.5) * FB_FRET_W;
   for (var s = 0; s < 6; s++) {
     var n = noteAtFret(s, openFret);
     if (!noteInSet(n, scale.notes)) continue;
+    var inBox = fretInBox(openFret);
     var col = notesMatch(n, scale.root) ? rootCol : toneCol;
-    svg += `<circle cx="${openCX}" cy="${STRING_Y[s]}" r="${FB_DOT_R}" fill="${col}" class="note-dot" data-note="${n}" data-string="${s}" data-fret="${openFret}" style="cursor:pointer;"/>`;
-    svg += `<text x="${openCX}" y="${STRING_Y[s]+0.5}" text-anchor="middle" dominant-baseline="central" font-size="${lblFont}" fill="#fff" font-family="var(--font-mono)" font-weight="600" style="pointer-events:none;">${dotLabel(n)}</text>`;
+    var op = inBox ? '1' : '0.15';
+    svg += `<circle cx="${openCX}" cy="${STRING_Y[s]}" r="${FB_DOT_R}" fill="${col}" opacity="${op}" class="note-dot" data-note="${n}" data-string="${s}" data-fret="${openFret}" style="cursor:pointer;"/>`;
+    svg += `<text x="${openCX}" y="${STRING_Y[s]+0.5}" text-anchor="middle" dominant-baseline="central" font-size="${lblFont}" fill="#fff" opacity="${op}" font-family="var(--font-mono)" font-weight="600" style="pointer-events:none;">${dotLabel(n)}</text>`;
   }
 
   // Fretted dots (skip frets behind capo)
@@ -1010,9 +1040,11 @@ function renderFretboard(scale) {
       if (!noteInSet(n, scale.notes)) continue;
       var x = FB_PAD_LEFT + (fi+0.5)*FB_FRET_W;
       var y = STRING_Y[s];
+      var inBox = fretInBox(f);
       var col = notesMatch(n, scale.root) ? rootCol : toneCol;
-      svg += `<circle cx="${x}" cy="${y}" r="${FB_DOT_R}" fill="${col}" class="note-dot" data-note="${n}" data-string="${s}" data-fret="${f}" style="cursor:pointer;"/>`;
-      svg += `<text x="${x}" y="${y+0.5}" text-anchor="middle" dominant-baseline="central" font-size="${lblFont}" fill="#fff" font-family="var(--font-mono)" font-weight="600" style="pointer-events:none;">${dotLabel(n)}</text>`;
+      var op = inBox ? '1' : '0.15';
+      svg += `<circle cx="${x}" cy="${y}" r="${FB_DOT_R}" fill="${col}" opacity="${op}" class="note-dot" data-note="${n}" data-string="${s}" data-fret="${f}" style="cursor:pointer;"/>`;
+      svg += `<text x="${x}" y="${y+0.5}" text-anchor="middle" dominant-baseline="central" font-size="${lblFont}" fill="#fff" opacity="${op}" font-family="var(--font-mono)" font-weight="600" style="pointer-events:none;">${dotLabel(n)}</text>`;
     }
   }
 
@@ -1120,9 +1152,85 @@ var currentScale = null;
 var tooltip      = document.getElementById('tooltip');
 var cardPosState = {};
 var showIntervals = false;
+var activePosition = -1; // -1 = all, 0..N = box index
+var scalePositions = [];
 var progression   = [];
 var progBPM       = 100;
 var progBeats     = 4;
+
+// A valid scale position must satisfy three rules:
+//   1. Every scale degree appears at least once in the fret range
+//   2. Every string has at least 2 scale notes (so you can play up/down it)
+//   3. Every degree appears on at least 2 strings (no note stranded on one string)
+// Together these enforce playable octave coverage without tracking actual
+// pitch octaves — if a degree only existed on one string at the box edge,
+// rule 3 rejects it and the window widens until the note shows up on a
+// neighboring string too. Minimum window is 4 frets; expands up to 7 if needed.
+// Then we tile the valid windows up the neck, preferring the narrowest at each step.
+function computeScalePositions(scale) {
+  var capoMin = Math.max(0, capoFret);
+  var candidates = [];
+
+  for (var startF = capoMin; startF <= capoMin + 13; startF++) {
+    for (var hi = startF + 3; hi <= Math.min(startF + 6, FRET_COUNT); hi++) {
+      var degreeStrings = {};
+      var stringsOK = true;
+      for (var s = 0; s < 6; s++) {
+        var count = 0;
+        for (var f = startF; f <= hi; f++) {
+          var n = noteAtFret(s, f);
+          if (noteInSet(n, scale.notes)) {
+            for (var d = 0; d < scale.notes.length; d++) {
+              if (notesMatch(n, scale.notes[d])) {
+                degreeStrings[d] = (degreeStrings[d] || 0) + 1;
+                break;
+              }
+            }
+            count++;
+          }
+        }
+        if (count < 2) stringsOK = false; // rule 2
+      }
+      var allDegrees = Object.keys(degreeStrings).length >= scale.notes.length; // rule 1
+      var allSpread = true;
+      for (var d in degreeStrings) { if (degreeStrings[d] < 2) allSpread = false; } // rule 3
+      if (allDegrees && stringsOK && allSpread) {
+        candidates.push({ lo: startF, hi: hi });
+        break;
+      }
+    }
+  }
+
+  var valid = candidates;
+  valid.sort(function(a, b) { return a.lo - b.lo; });
+
+  // Tile valid windows up the neck — each new position starts where the
+  // previous one ended (±1 fret overlap). When multiple candidates start
+  // at the same fret, pick the narrowest.
+  var selected = [];
+  if (valid.length) {
+    selected.push(valid[0]);
+    var cursor = valid[0].hi;
+    for (var i = 1; i < valid.length; i++) {
+      if (valid[i].lo >= cursor && valid[i].lo <= cursor + 1) {
+        // Look ahead for a narrower candidate at the same or next lo
+        var best = valid[i];
+        for (var k = i + 1; k < valid.length && valid[k].lo <= best.lo + 1; k++) {
+          if (valid[k].lo >= cursor && valid[k].lo <= cursor + 1 && (valid[k].hi - valid[k].lo) < (best.hi - best.lo)) {
+            best = valid[k];
+          }
+        }
+        selected.push(best);
+        cursor = best.hi;
+      }
+    }
+  }
+
+  for (var i = 0; i < selected.length; i++) {
+    selected[i].label = i + 1;
+  }
+  return selected;
+}
 
 function getNoteInfo(note, scale) {
   for (var i = 0; i < scale.notes.length; i++) {
@@ -1279,10 +1387,18 @@ function render() {
     }
   }
 
-  var intervalTags = '';
-  for (var i = 0; i < scale.notes.length; i++) {
-    intervalTags += `<span class="interval-tag">${scale.notes[i]} = ${scale.intervals[i]}</span>`;
+
+  // Compute scale positions
+  scalePositions = computeScalePositions(scale);
+  if (activePosition >= scalePositions.length) activePosition = -1;
+
+  var posBarHTML = '<div class="pos-bar"><span class="pos-bar-label">Position</span>';
+  posBarHTML += `<button class="pos-btn${activePosition===-1?' active':''}" onclick="setPosition(-1)">All</button>`;
+  for (var i = 0; i < scalePositions.length; i++) {
+    var sp = scalePositions[i];
+    posBarHTML += `<button class="pos-btn${activePosition===i?' active':''}" onclick="setPosition(${i})">${sp.label}<span class="pos-frets">fr ${sp.lo}\u2013${sp.hi}</span></button>`;
   }
+  posBarHTML += '</div>';
 
   // Flatten all chord sections into two rows
   function renderChordRow(chords) {
@@ -1346,7 +1462,7 @@ function render() {
         <span class="hint">Click notes to hear \u00B7 hover for detail</span>
       </div>
       <div class="fretboard-wrap">${renderFretboard(scale)}</div>
-      <div class="interval-row">${intervalTags}</div>
+      ${posBarHTML}
       ${renderProgStrip()}
       ${chordsStripHTML}
     </div>`;
@@ -1540,6 +1656,11 @@ window.toggleIntervals = function() {
   render();
 };
 
+window.setPosition = function(idx) {
+  activePosition = idx;
+  render();
+};
+
 // ══════════════════════════════════════════════════════
 //  PERSISTENCE
 // ══════════════════════════════════════════════════════
@@ -1566,7 +1687,7 @@ function loadPrefs() {
   } catch(e) {}
 }
 
-window.setTab = function(id) { activeTab = id; savePrefs(); render(); };
+window.setTab = function(id) { activeTab = id; activePosition = -1; savePrefs(); render(); };
 window.setRoot = function(note) { activeRoot = note; savePrefs(); render(); };
 window.setCapo = function(n) {
   if (n < -5 || n > 12) return;
