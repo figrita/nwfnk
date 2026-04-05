@@ -308,7 +308,7 @@ var TUNINGS = {
   'ukulele':      { name: 'Ukulele (GCEA)',     short: 'Ukulele',       strings: ['G','C','E','A'],          midi: [7,0,4,9],        frets: 15 },
   'tenor-uke':    { name: 'Tenor Uke (DGBE)',   short: 'Tenor Uke',     strings: ['D','G','B','E'],          midi: [2,7,11,4],       frets: 17 },
   'bass':         { name: 'Bass (EADG)',        short: 'Bass',          strings: ['E','A','D','G'],          midi: [4,9,2,7],        frets: 17 },
-  'banjo':        { name: '5-String Banjo',     short: 'Banjo',         strings: ['g','D','G','B','D'],      midi: [7,2,7,11,2],     frets: 17 },
+  'banjo':        { name: '5-String Banjo',     short: 'Banjo',         strings: ['D','G','B','D','g'],      midi: [2,7,11,2,7],     frets: 17, drone: 4 },
 };
 var activeTuning = 'guitar';
 
@@ -494,154 +494,225 @@ const SHAPE_TEMPLATES = {
 
 var SHAPE_TEMPLATES_4 = {
   power5: [
-    { label:'5th',    semis:[0,7],              ss:[0,1], span:3 },
-    { label:'5th',    semis:[0,7],              ss:[1,2], span:3 },
-    { label:'5th',    semis:[0,7],              ss:[2,3], span:3 },
+    { label:'5th',     semis:[0,7],              ss:[0,1], span:3 },
+    { label:'5th',     semis:[0,7],              ss:[1,2], span:3 },
+    { label:'5th',     semis:[0,7],              ss:[2,3], span:3 },
   ],
   major: [
-    { label:'Full',   semis:[0,4,7,12],         ss:[0,1,2,3], span:5 },
-    { label:'Full',   semis:[0,7,12,16],         ss:[0,1,2,3], span:5 },
-    { label:'Triad',  semis:[0,4,7],            ss:[0,1,2],   span:5 },
-    { label:'Triad',  semis:[0,4,7],            ss:[1,2,3],   span:5 },
+    // Root position
+    { label:'Root',    semis:[0,4,7,12],         ss:[0,1,2,3], span:5 },
+    { label:'Root',    semis:[0,7,12,16],         ss:[0,1,2,3], span:5 },
+    // 1st inversion (3rd in bass)
+    { label:'1st inv', semis:[4,7,12,16],         ss:[0,1,2,3], span:5 },
+    // 2nd inversion (5th in bass)
+    { label:'2nd inv', semis:[7,12,16,19],         ss:[0,1,2,3], span:5 },
+    { label:'2nd inv', semis:[7,0,4,12],          ss:[0,1,2,3], span:5 },
+    // Triads
+    { label:'Triad',   semis:[0,4,7],            ss:[0,1,2],   span:5 },
+    { label:'Triad',   semis:[0,4,7],            ss:[1,2,3],   span:5 },
+    { label:'Triad',   semis:[4,7,12],           ss:[0,1,2],   span:5 },
+    { label:'Triad',   semis:[7,12,16],           ss:[1,2,3],   span:5 },
   ],
   minor: [
-    { label:'Full',   semis:[0,3,7,12],         ss:[0,1,2,3], span:5 },
-    { label:'Full',   semis:[0,7,12,15],         ss:[0,1,2,3], span:5 },
-    { label:'Triad',  semis:[0,3,7],            ss:[0,1,2],   span:5 },
-    { label:'Triad',  semis:[0,3,7],            ss:[1,2,3],   span:5 },
+    // Root position
+    { label:'Root',    semis:[0,3,7,12],         ss:[0,1,2,3], span:5 },
+    { label:'Root',    semis:[0,7,12,15],         ss:[0,1,2,3], span:5 },
+    // 1st inversion (m3 in bass)
+    { label:'1st inv', semis:[3,7,12,15],         ss:[0,1,2,3], span:5 },
+    // 2nd inversion (5th in bass)
+    { label:'2nd inv', semis:[7,12,15,19],         ss:[0,1,2,3], span:5 },
+    { label:'2nd inv', semis:[7,0,3,12],          ss:[0,1,2,3], span:5 },
+    // Triads
+    { label:'Triad',   semis:[0,3,7],            ss:[0,1,2],   span:5 },
+    { label:'Triad',   semis:[0,3,7],            ss:[1,2,3],   span:5 },
+    { label:'Triad',   semis:[3,7,12],           ss:[0,1,2],   span:5 },
+    { label:'Triad',   semis:[7,12,15],           ss:[1,2,3],   span:5 },
   ],
   maj7: [
-    { label:'Full',   semis:[0,4,7,11],         ss:[0,1,2,3], span:5 },
-    { label:'Full',   semis:[0,7,11,16],         ss:[0,1,2,3], span:5 },
-    { label:'3-str',  semis:[0,4,11],           ss:[0,1,2],   span:5 },
-    { label:'3-str',  semis:[0,7,11],           ss:[1,2,3],   span:5 },
+    // Root position
+    { label:'Root',    semis:[0,4,7,11],         ss:[0,1,2,3], span:5 },
+    { label:'Root',    semis:[0,7,11,16],         ss:[0,1,2,3], span:5 },
+    // 1st inversion (3rd in bass)
+    { label:'1st inv', semis:[4,7,11,12],         ss:[0,1,2,3], span:5 },
+    // 2nd inversion (5th in bass)
+    { label:'2nd inv', semis:[7,11,12,16],         ss:[0,1,2,3], span:5 },
+    // 3rd inversion (7th in bass)
+    { label:'3rd inv', semis:[11,12,16,19],        ss:[0,1,2,3], span:5 },
+    // Partials
+    { label:'3-str',   semis:[0,4,11],           ss:[0,1,2],   span:5 },
+    { label:'3-str',   semis:[0,7,11],           ss:[1,2,3],   span:5 },
   ],
   minor7: [
-    { label:'Full',   semis:[0,3,7,10],         ss:[0,1,2,3], span:5 },
-    { label:'Full',   semis:[0,7,10,15],         ss:[0,1,2,3], span:5 },
-    { label:'3-str',  semis:[0,3,10],           ss:[0,1,2],   span:5 },
-    { label:'3-str',  semis:[0,7,10],           ss:[1,2,3],   span:5 },
+    // Root position
+    { label:'Root',    semis:[0,3,7,10],         ss:[0,1,2,3], span:5 },
+    { label:'Root',    semis:[0,7,10,15],         ss:[0,1,2,3], span:5 },
+    // 1st inversion (m3 in bass)
+    { label:'1st inv', semis:[3,7,10,12],         ss:[0,1,2,3], span:5 },
+    // 2nd inversion (5th in bass)
+    { label:'2nd inv', semis:[7,10,12,15],         ss:[0,1,2,3], span:5 },
+    // 3rd inversion (b7 in bass) — e.g. Am7 = 0000 on GCEA uke
+    { label:'3rd inv', semis:[10,12,15,19],        ss:[0,1,2,3], span:5 },
+    { label:'3rd inv', semis:[10,3,7,12],         ss:[0,1,2,3], span:5 },
+    // Partials
+    { label:'3-str',   semis:[0,3,10],           ss:[0,1,2],   span:5 },
+    { label:'3-str',   semis:[0,7,10],           ss:[1,2,3],   span:5 },
   ],
   dom7: [
-    { label:'Full',   semis:[0,4,7,10],         ss:[0,1,2,3], span:5 },
-    { label:'Full',   semis:[0,7,10,16],         ss:[0,1,2,3], span:5 },
-    { label:'3-str',  semis:[0,4,10],           ss:[0,1,2],   span:5 },
-    { label:'3-str',  semis:[0,7,10],           ss:[1,2,3],   span:5 },
+    // Root position
+    { label:'Root',    semis:[0,4,7,10],         ss:[0,1,2,3], span:5 },
+    { label:'Root',    semis:[0,7,10,16],         ss:[0,1,2,3], span:5 },
+    // 1st inversion (3rd in bass)
+    { label:'1st inv', semis:[4,7,10,12],         ss:[0,1,2,3], span:5 },
+    // 2nd inversion (5th in bass)
+    { label:'2nd inv', semis:[7,10,12,16],         ss:[0,1,2,3], span:5 },
+    // 3rd inversion (b7 in bass)
+    { label:'3rd inv', semis:[10,12,16,19],        ss:[0,1,2,3], span:5 },
+    { label:'3rd inv', semis:[10,4,7,12],         ss:[0,1,2,3], span:5 },
+    // Partials
+    { label:'3-str',   semis:[0,4,10],           ss:[0,1,2],   span:5 },
+    { label:'3-str',   semis:[0,7,10],           ss:[1,2,3],   span:5 },
   ],
   dom9: [
-    { label:'Full',   semis:[0,4,10,14],        ss:[0,1,2,3], span:5 },
-    { label:'Full',   semis:[0,10,14,16],        ss:[0,1,2,3], span:5 },
+    { label:'Full',    semis:[0,4,10,14],        ss:[0,1,2,3], span:5 },
+    { label:'Full',    semis:[0,10,14,16],        ss:[0,1,2,3], span:5 },
+    { label:'Inv',     semis:[10,14,16,4],        ss:[0,1,2,3], span:5 },
+    { label:'Inv',     semis:[14,4,7,10],         ss:[0,1,2,3], span:5 },
   ],
   dom13: [
-    { label:'Full',   semis:[0,10,16,21],        ss:[0,1,2,3], span:5 },
+    { label:'Full',    semis:[0,10,16,21],        ss:[0,1,2,3], span:5 },
+    { label:'Inv',     semis:[10,16,21,4],        ss:[0,1,2,3], span:5 },
   ],
   maj6: [
-    { label:'Full',   semis:[0,4,7,9],          ss:[0,1,2,3], span:5 },
-    { label:'3-str',  semis:[0,7,9],            ss:[1,2,3],   span:5 },
+    { label:'Full',    semis:[0,4,7,9],          ss:[0,1,2,3], span:5 },
+    { label:'Inv',     semis:[9,0,4,7],           ss:[0,1,2,3], span:5 },
+    { label:'3-str',   semis:[0,7,9],            ss:[1,2,3],   span:5 },
   ],
   maj9: [
-    { label:'Full',   semis:[0,4,11,14],        ss:[0,1,2,3], span:5 },
-    { label:'Full',   semis:[0,7,11,14],        ss:[0,1,2,3], span:5 },
+    { label:'Full',    semis:[0,4,11,14],        ss:[0,1,2,3], span:5 },
+    { label:'Full',    semis:[0,7,11,14],        ss:[0,1,2,3], span:5 },
+    { label:'Inv',     semis:[11,14,16,4],        ss:[0,1,2,3], span:5 },
   ],
   minor9: [
-    { label:'Full',   semis:[0,3,10,14],        ss:[0,1,2,3], span:5 },
-    { label:'Full',   semis:[0,10,14,15],        ss:[0,1,2,3], span:5 },
+    { label:'Full',    semis:[0,3,10,14],        ss:[0,1,2,3], span:5 },
+    { label:'Full',    semis:[0,10,14,15],        ss:[0,1,2,3], span:5 },
+    { label:'Inv',     semis:[10,14,15,3],        ss:[0,1,2,3], span:5 },
   ],
   add9: [
-    { label:'Full',   semis:[0,4,7,14],         ss:[0,1,2,3], span:5 },
-    { label:'3-str',  semis:[0,7,14],           ss:[1,2,3],   span:5 },
+    { label:'Full',    semis:[0,4,7,14],         ss:[0,1,2,3], span:5 },
+    { label:'Inv',     semis:[7,12,14,16],        ss:[0,1,2,3], span:5 },
+    { label:'3-str',   semis:[0,7,14],           ss:[1,2,3],   span:5 },
   ],
   dom7sus4: [
-    { label:'Full',   semis:[0,5,7,10],         ss:[0,1,2,3], span:5 },
+    { label:'Full',    semis:[0,5,7,10],         ss:[0,1,2,3], span:5 },
+    { label:'Inv',     semis:[5,7,10,12],         ss:[0,1,2,3], span:5 },
+    { label:'Inv',     semis:[10,12,17,19],        ss:[0,1,2,3], span:5 },
   ],
   dom7s9: [
-    { label:'Full',   semis:[0,4,10,15],        ss:[0,1,2,3], span:5 },
+    { label:'Root',    semis:[0,4,10,15],        ss:[0,1,2,3], span:5 },
+    { label:'Inv',     semis:[4,10,15,12],        ss:[0,1,2,3], span:5 },
   ],
   dom7b9: [
-    { label:'Full',   semis:[0,4,10,13],        ss:[0,1,2,3], span:5 },
+    { label:'Root',    semis:[0,4,10,13],        ss:[0,1,2,3], span:5 },
+    { label:'Inv',     semis:[4,10,13,12],        ss:[0,1,2,3], span:5 },
   ],
   dim7: [
-    { label:'Full',   semis:[0,3,6,9],          ss:[0,1,2,3], span:4 },
-    { label:'3-str',  semis:[0,3,6],            ss:[0,1,2],   span:4 },
-    { label:'3-str',  semis:[0,3,6],            ss:[1,2,3],   span:4 },
+    { label:'Full',    semis:[0,3,6,9],          ss:[0,1,2,3], span:4 },
+    { label:'Inv',     semis:[3,6,9,12],          ss:[0,1,2,3], span:4 },
+    { label:'3-str',   semis:[0,3,6],            ss:[0,1,2],   span:4 },
+    { label:'3-str',   semis:[0,3,6],            ss:[1,2,3],   span:4 },
   ],
 };
 
 // ── 5-string shapes (banjo) ──
 
+// Banjo: strings [D,G,B,D,g] — string 4 is the drone (open G only).
+// Shapes focus on strings 0-3, with some including the open drone.
 var SHAPE_TEMPLATES_5 = {
   power5: [
-    { label:'5th',    semis:[0,7],              ss:[0,1], span:3 },
-    { label:'5th',    semis:[0,7],              ss:[1,2], span:3 },
-    { label:'5th',    semis:[0,7],              ss:[2,3], span:3 },
-    { label:'5th',    semis:[0,7],              ss:[3,4], span:3 },
+    { label:'5th',       semis:[0,7],              ss:[0,1], span:3 },
+    { label:'5th',       semis:[0,7],              ss:[1,2], span:3 },
+    { label:'5th',       semis:[0,7],              ss:[2,3], span:3 },
   ],
   major: [
-    { label:'Full',   semis:[0,4,7,12,16],      ss:[0,1,2,3,4], span:5 },
-    { label:'Full',   semis:[0,7,12,16,19],      ss:[0,1,2,3,4], span:5 },
-    { label:'4-str',  semis:[0,7,12,16],        ss:[1,2,3,4],   span:4 },
-    { label:'Triad',  semis:[0,4,7],            ss:[0,1,2],     span:5 },
-    { label:'Triad',  semis:[0,4,7],            ss:[2,3,4],     span:5 },
+    // Main 4-string voicings (strings 0-3)
+    { label:'Root',      semis:[0,4,7,12],         ss:[0,1,2,3], span:5 },
+    { label:'Root',      semis:[0,7,12,16],         ss:[0,1,2,3], span:5 },
+    { label:'1st inv',   semis:[4,7,12,16],         ss:[0,1,2,3], span:5 },
+    { label:'2nd inv',   semis:[7,0,4,12],          ss:[0,1,2,3], span:5 },
+    // With drone (string 4 = open G, semis relative to root must land on G)
+    { label:'+drone',    semis:[0,4,7,12,7],       ss:[0,1,2,3,4], span:5 },
+    { label:'+drone',    semis:[0,7,12,16,19],      ss:[0,1,2,3,4], span:5 },
+    // Triads
+    { label:'Triad',     semis:[0,4,7],            ss:[0,1,2], span:5 },
+    { label:'Triad',     semis:[0,4,7],            ss:[1,2,3], span:5 },
   ],
   minor: [
-    { label:'Full',   semis:[0,3,7,12,15],      ss:[0,1,2,3,4], span:5 },
-    { label:'Full',   semis:[0,7,12,15,19],      ss:[0,1,2,3,4], span:5 },
-    { label:'4-str',  semis:[0,7,12,15],        ss:[1,2,3,4],   span:4 },
-    { label:'Triad',  semis:[0,3,7],            ss:[0,1,2],     span:5 },
-    { label:'Triad',  semis:[0,3,7],            ss:[2,3,4],     span:5 },
+    { label:'Root',      semis:[0,3,7,12],         ss:[0,1,2,3], span:5 },
+    { label:'Root',      semis:[0,7,12,15],         ss:[0,1,2,3], span:5 },
+    { label:'1st inv',   semis:[3,7,12,15],         ss:[0,1,2,3], span:5 },
+    { label:'2nd inv',   semis:[7,0,3,12],          ss:[0,1,2,3], span:5 },
+    { label:'+drone',    semis:[0,3,7,12,7],       ss:[0,1,2,3,4], span:5 },
+    { label:'Triad',     semis:[0,3,7],            ss:[0,1,2], span:5 },
+    { label:'Triad',     semis:[0,3,7],            ss:[1,2,3], span:5 },
   ],
   maj7: [
-    { label:'Full',   semis:[0,4,7,11,16],      ss:[0,1,2,3,4], span:5 },
-    { label:'4-str',  semis:[0,7,11,16],        ss:[1,2,3,4],   span:5 },
-    { label:'4-str',  semis:[0,4,7,11],         ss:[0,1,2,3],   span:5 },
+    { label:'Root',      semis:[0,4,7,11],         ss:[0,1,2,3], span:5 },
+    { label:'Root',      semis:[0,7,11,16],         ss:[0,1,2,3], span:5 },
+    { label:'1st inv',   semis:[4,7,11,12],         ss:[0,1,2,3], span:5 },
+    { label:'3rd inv',   semis:[11,12,16,19],        ss:[0,1,2,3], span:5 },
+    { label:'+drone',    semis:[0,4,7,11,7],       ss:[0,1,2,3,4], span:5 },
   ],
   minor7: [
-    { label:'Full',   semis:[0,3,7,10,15],      ss:[0,1,2,3,4], span:5 },
-    { label:'4-str',  semis:[0,7,10,15],        ss:[1,2,3,4],   span:4 },
-    { label:'4-str',  semis:[0,3,7,10],         ss:[0,1,2,3],   span:5 },
+    { label:'Root',      semis:[0,3,7,10],         ss:[0,1,2,3], span:5 },
+    { label:'Root',      semis:[0,7,10,15],         ss:[0,1,2,3], span:5 },
+    { label:'1st inv',   semis:[3,7,10,12],         ss:[0,1,2,3], span:5 },
+    { label:'3rd inv',   semis:[10,12,15,19],        ss:[0,1,2,3], span:5 },
+    { label:'3rd inv',   semis:[10,3,7,12],         ss:[0,1,2,3], span:5 },
+    { label:'+drone',    semis:[0,3,7,10,7],       ss:[0,1,2,3,4], span:5 },
   ],
   dom7: [
-    { label:'Full',   semis:[0,4,7,10,16],      ss:[0,1,2,3,4], span:5 },
-    { label:'4-str',  semis:[0,7,10,16],        ss:[1,2,3,4],   span:4 },
-    { label:'4-str',  semis:[0,4,7,10],         ss:[0,1,2,3],   span:5 },
+    { label:'Root',      semis:[0,4,7,10],         ss:[0,1,2,3], span:5 },
+    { label:'Root',      semis:[0,7,10,16],         ss:[0,1,2,3], span:5 },
+    { label:'1st inv',   semis:[4,7,10,12],         ss:[0,1,2,3], span:5 },
+    { label:'3rd inv',   semis:[10,12,16,19],        ss:[0,1,2,3], span:5 },
+    { label:'+drone',    semis:[0,4,7,10,7],       ss:[0,1,2,3,4], span:5 },
   ],
   dom9: [
-    { label:'Full',   semis:[0,7,10,14,16],     ss:[0,1,2,3,4], span:5 },
-    { label:'4-str',  semis:[0,10,14,16],       ss:[1,2,3,4],   span:5 },
+    { label:'Root',      semis:[0,4,10,14],        ss:[0,1,2,3], span:5 },
+    { label:'Full',      semis:[0,7,10,14,16],     ss:[0,1,2,3,4], span:5 },
   ],
   dom13: [
-    { label:'Full',   semis:[0,7,10,16,21],     ss:[0,1,2,3,4], span:5 },
+    { label:'Root',      semis:[0,10,16,21],        ss:[0,1,2,3], span:5 },
   ],
   maj6: [
-    { label:'4-str',  semis:[0,7,9,16],         ss:[1,2,3,4],   span:5 },
-    { label:'4-str',  semis:[0,4,7,9],          ss:[0,1,2,3],   span:5 },
+    { label:'Root',      semis:[0,4,7,9],          ss:[0,1,2,3], span:5 },
+    { label:'Inv',       semis:[9,0,4,7],           ss:[0,1,2,3], span:5 },
   ],
   maj9: [
-    { label:'Full',   semis:[0,7,11,14,16],     ss:[0,1,2,3,4], span:5 },
+    { label:'Root',      semis:[0,4,11,14],        ss:[0,1,2,3], span:5 },
+    { label:'Full',      semis:[0,7,11,14,16],     ss:[0,1,2,3,4], span:5 },
   ],
   minor9: [
-    { label:'Full',   semis:[0,7,10,14,15],     ss:[0,1,2,3,4], span:5 },
-    { label:'4-str',  semis:[0,10,14,15],       ss:[1,2,3,4],   span:5 },
+    { label:'Root',      semis:[0,3,10,14],        ss:[0,1,2,3], span:5 },
+    { label:'Inv',       semis:[10,14,15,3],        ss:[0,1,2,3], span:5 },
   ],
   add9: [
-    { label:'4-str',  semis:[0,7,12,14],        ss:[1,2,3,4],   span:5 },
-    { label:'4-str',  semis:[0,4,7,14],         ss:[0,1,2,3],   span:5 },
+    { label:'Root',      semis:[0,4,7,14],         ss:[0,1,2,3], span:5 },
+    { label:'Inv',       semis:[7,12,14,16],        ss:[0,1,2,3], span:5 },
   ],
   dom7sus4: [
-    { label:'4-str',  semis:[0,5,7,10],         ss:[0,1,2,3],   span:5 },
-    { label:'4-str',  semis:[0,5,7,10],         ss:[1,2,3,4],   span:5 },
+    { label:'Root',      semis:[0,5,7,10],         ss:[0,1,2,3], span:5 },
+    { label:'Inv',       semis:[5,7,10,12],         ss:[0,1,2,3], span:5 },
   ],
   dom7s9: [
-    { label:'Full',   semis:[0,4,7,10,15],      ss:[0,1,2,3,4], span:5 },
-    { label:'4-str',  semis:[0,4,10,15],        ss:[1,2,3,4],   span:5 },
+    { label:'Root',      semis:[0,4,10,15],        ss:[0,1,2,3], span:5 },
   ],
   dom7b9: [
-    { label:'Full',   semis:[0,4,7,10,13],      ss:[0,1,2,3,4], span:5 },
-    { label:'4-str',  semis:[0,4,10,13],        ss:[1,2,3,4],   span:5 },
+    { label:'Root',      semis:[0,4,10,13],        ss:[0,1,2,3], span:5 },
   ],
   dim7: [
-    { label:'4-str',  semis:[0,3,6,9],          ss:[1,2,3,4],   span:4 },
-    { label:'4-str',  semis:[0,3,6,9],          ss:[0,1,2,3],   span:4 },
+    { label:'Root',      semis:[0,3,6,9],          ss:[0,1,2,3], span:4 },
+    { label:'Inv',       semis:[3,6,9,12],          ss:[0,1,2,3], span:4 },
   ],
 };
 
@@ -661,14 +732,17 @@ function generatePositions(chordName, rootNote, shapeName) {
   if (rootPc === -1) return [];
   var positions = [];
   var sc = STRING_COUNT;
+  var drone = TUNINGS[activeTuning].drone;
 
   for (var t = 0; t < templates.length; t++) {
     var tmpl = templates[t];
-    var loStr  = tmpl.ss[0];
-    var openPc = OPEN_MIDI[loStr];
+    var loStr    = tmpl.ss[0];
+    var openPc   = OPEN_MIDI[loStr];
+    // Anchor on the expected note for the lowest string (supports inversions)
+    var loTarget = (rootPc + tmpl.semis[0]) % 12;
 
-    for (var rootFret = 0; rootFret <= FRET_COUNT; rootFret++) {
-      if ((openPc + rootFret) % 12 !== rootPc) continue;
+    for (var anchorFret = 0; anchorFret <= FRET_COUNT; anchorFret++) {
+      if ((openPc + anchorFret) % 12 !== loTarget) continue;
       var assignment = [];
       var valid = true;
 
@@ -678,8 +752,10 @@ function generatePositions(chordName, rootNote, shapeName) {
         var targetPc = (rootPc + tmpl.semis[i]) % 12;
         var openS    = OPEN_MIDI[s];
         var fret = (targetPc - openS + 12) % 12;
-        while (fret < rootFret - tmpl.span) fret += 12;
+        while (fret < anchorFret - tmpl.span) fret += 12;
         if (fret > FRET_COUNT) { valid = false; break; }
+        // Drone string can only be open (fret 0) or skipped
+        if (drone !== undefined && s === drone && fret !== 0) { valid = false; break; }
         assignment.push({ string: s, fret: fret, note: NOTE_NAMES[targetPc] });
       }
       if (!valid) continue;
