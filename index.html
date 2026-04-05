@@ -155,6 +155,112 @@
   .diagram-svg-slot svg { display: block; }
   .pos-sublabel { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-tertiary); text-align: center; margin-top: 2px; }
 
+  /* Interval toggle */
+  .legend-toggle {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+    padding: 3px 10px; border-radius: 5px; border: 1.5px solid var(--border);
+    background: transparent; color: var(--text-tertiary); cursor: pointer;
+    transition: all 0.15s; letter-spacing: 0.5px;
+  }
+  .legend-toggle:hover { border-color: var(--tortoise); color: var(--text-secondary); }
+  .legend-toggle.active { background: var(--tortoise); color: #FFF8F0; border-color: var(--tortoise); }
+
+  /* Progression builder */
+  .prog-strip {
+    background: var(--bg-warm); border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 10px 14px; margin-bottom: 10px; min-height: 44px;
+  }
+  .prog-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .prog-label {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 2px; color: var(--text-tertiary);
+  }
+  .prog-clear {
+    font-family: var(--font-mono); font-size: 10px;
+    padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border);
+    background: transparent; color: var(--text-tertiary); cursor: pointer;
+    transition: all 0.12s;
+  }
+  .prog-clear:hover { border-color: var(--root-color); color: var(--root-color); }
+  .prog-play {
+    font-family: var(--font-mono); font-size: 10px;
+    padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border);
+    background: transparent; color: var(--text-tertiary); cursor: pointer;
+    transition: all 0.12s;
+  }
+  .prog-play:hover { border-color: var(--seafoam); color: var(--seafoam); }
+  .prog-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .prog-chip {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    padding: 4px 10px; border-radius: 5px;
+    background: var(--bg-card); border: 1.5px solid var(--border);
+    color: var(--text-primary); cursor: pointer; transition: all 0.12s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .prog-chip:hover { border-color: var(--root-color); }
+  .prog-chip .prog-num {
+    font-size: 10px; color: var(--tortoise); font-weight: 600;
+  }
+  .prog-chip .prog-x {
+    font-size: 10px; color: var(--text-tertiary); margin-left: 2px;
+  }
+  .prog-chip:hover .prog-x { color: var(--root-color); }
+  .prog-chip .prog-pos {
+    font-size: 9px; color: var(--text-tertiary); font-weight: 400;
+  }
+  .prog-chip:hover { border-color: var(--seafoam); background: var(--bg-card-hover); }
+  .prog-peek {
+    display: none; position: fixed; z-index: 900;
+    background: #FFFDF8; border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 8px 10px 6px; box-shadow: 0 6px 20px rgba(44,24,16,0.12);
+    pointer-events: none; flex-direction: column; align-items: center;
+  }
+  .prog-peek.visible { display: flex; }
+  .prog-peek-label {
+    font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary);
+    letter-spacing: 1px; text-transform: uppercase; margin-top: 2px;
+  }
+  .prog-tempo {
+    display: flex; align-items: center; gap: 5px; margin-left: auto;
+  }
+  .prog-tempo label {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.5px;
+    color: var(--text-tertiary); text-transform: uppercase;
+  }
+  .prog-tempo input {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    width: 42px; text-align: center; padding: 2px 4px;
+    border-radius: 4px; border: 1.5px solid var(--border);
+    background: var(--bg-card); color: var(--text-primary);
+  }
+  .prog-tempo input:focus { outline: none; border-color: var(--tortoise); }
+  .prog-tempo select {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    padding: 2px 6px; border-radius: 4px; border: 1.5px solid var(--border);
+    background: var(--bg-card); color: var(--text-primary); cursor: pointer;
+  }
+  .prog-tempo select:focus { outline: none; border-color: var(--tortoise); }
+  .prog-empty {
+    font-size: 12px; color: var(--text-tertiary); font-style: italic;
+  }
+
+  /* Sound feedback */
+  .chord-card .cc-add {
+    font-family: var(--font-mono); font-size: 10px;
+    padding: 2px 7px; border-radius: 3px; border: 1px solid var(--border);
+    background: transparent; color: var(--text-tertiary); cursor: pointer;
+    transition: all 0.12s; margin-left: auto;
+  }
+  .chord-card .cc-add:hover { border-color: var(--seafoam); color: var(--seafoam); }
+  .chord-card .cc-play {
+    font-family: var(--font-mono); font-size: 10px;
+    padding: 2px 7px; border-radius: 3px; border: 1px solid var(--border);
+    background: transparent; color: var(--text-tertiary); cursor: pointer;
+    transition: all 0.12s;
+  }
+  .chord-card .cc-play:hover { border-color: var(--seafoam); color: var(--seafoam); }
+  .note-dot { cursor: pointer; }
+
   .note-tooltip { display: none; position: fixed; z-index: 1000; background: #FFFDF8; border: 1.5px solid var(--border); border-radius: 8px; padding: 12px 16px; pointer-events: none; box-shadow: 0 6px 20px rgba(44,24,16,0.12); min-width: 200px; max-width: 320px; }
   .note-tooltip.visible { display: block; }
   .tt-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border-light); }
@@ -193,6 +299,7 @@
   <main id="content"></main>
 </div>
 <div class="note-tooltip" id="tooltip"></div>
+<div class="prog-peek" id="prog-peek"></div>
 
 <script>
 const SCALES = [
@@ -348,6 +455,79 @@ const SCALES = [
     ]
   }
 ];
+
+// ══════════════════════════════════════════════════════
+//  AUDIO ENGINE
+// ══════════════════════════════════════════════════════
+
+var audioCtx = null;
+const OPEN_MIDI_ABS = [40, 45, 50, 55, 59, 64]; // E2 A2 D3 G3 B3 E4
+
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function midiToFreq(midi) { return 440 * Math.pow(2, (midi - 69) / 12); }
+
+function fretToMidi(s, f) {
+  var detuning = capoFret < 0 ? capoFret : 0;
+  return OPEN_MIDI_ABS[s] + detuning + f;
+}
+
+function playTone(freq, startTime, duration, velocity) {
+  var ctx = ensureAudio();
+  var t = startTime || ctx.currentTime;
+  var dur = duration || 0.8;
+  var vel = typeof velocity === 'number' ? velocity : 1.0;
+
+  var osc1 = ctx.createOscillator();
+  var osc2 = ctx.createOscillator();
+  var gain = ctx.createGain();
+  var filter = ctx.createBiquadFilter();
+
+  osc1.type = 'triangle';
+  osc1.frequency.value = freq;
+  osc2.type = 'sine';
+  osc2.frequency.value = freq * 2;
+
+  filter.type = 'lowpass';
+  filter.frequency.value = 2500;
+  filter.frequency.exponentialRampToValueAtTime(600, t + dur * 0.5);
+
+  var peak = 0.18 * vel;
+  gain.gain.setValueAtTime(0, t);
+  gain.gain.linearRampToValueAtTime(peak, t + 0.008);
+  gain.gain.exponentialRampToValueAtTime(peak * 0.33, t + dur * 0.3);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+  osc1.connect(filter);
+  osc2.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc1.start(t);
+  osc2.start(t);
+  osc1.stop(t + dur);
+  osc2.stop(t + dur);
+}
+
+function playNote(stringIdx, fret) {
+  var midi = fretToMidi(stringIdx, fret);
+  playTone(midiToFreq(midi));
+}
+
+function playChordStrum(assignment) {
+  if (!assignment || !assignment.length) return;
+  var ctx = ensureAudio();
+  var sorted = assignment.slice().sort(function(a, b) { return a.string - b.string; });
+  var t = ctx.currentTime;
+  for (var i = 0; i < sorted.length; i++) {
+    var midi = fretToMidi(sorted[i].string, sorted[i].fret);
+    playTone(midiToFreq(midi), t + i * 0.035, 1.2);
+  }
+}
 
 // ══════════════════════════════════════════════════════
 //  THEORY ENGINE
@@ -791,6 +971,15 @@ function renderFretboard(scale) {
   var toneCol = '#6AAF96';
   var capoMin = Math.max(0, capoFret);
 
+  function dotLabel(note) {
+    if (!showIntervals) return note;
+    for (var i = 0; i < scale.notes.length; i++) {
+      if (notesMatch(scale.notes[i], note)) return scale.intervals[i];
+    }
+    return note;
+  }
+  var lblFont = showIntervals ? FB_FONT - 1 : FB_FONT;
+
   // Shade frets behind capo (positive capo)
   if (capoFret > 0) {
     var shadeX2 = FB_PAD_LEFT + capoFret * FB_FRET_W;
@@ -809,7 +998,7 @@ function renderFretboard(scale) {
     if (!noteInSet(n, scale.notes)) continue;
     var col = notesMatch(n, scale.root) ? rootCol : toneCol;
     svg += `<circle cx="${openCX}" cy="${STRING_Y[s]}" r="${FB_DOT_R}" fill="${col}" class="note-dot" data-note="${n}" data-string="${s}" data-fret="${openFret}" style="cursor:pointer;"/>`;
-    svg += `<text x="${openCX}" y="${STRING_Y[s]+0.5}" text-anchor="middle" dominant-baseline="central" font-size="${FB_FONT}" fill="#fff" font-family="var(--font-mono)" font-weight="600" style="pointer-events:none;">${n}</text>`;
+    svg += `<text x="${openCX}" y="${STRING_Y[s]+0.5}" text-anchor="middle" dominant-baseline="central" font-size="${lblFont}" fill="#fff" font-family="var(--font-mono)" font-weight="600" style="pointer-events:none;">${dotLabel(n)}</text>`;
   }
 
   // Fretted dots (skip frets behind capo)
@@ -823,7 +1012,7 @@ function renderFretboard(scale) {
       var y = STRING_Y[s];
       var col = notesMatch(n, scale.root) ? rootCol : toneCol;
       svg += `<circle cx="${x}" cy="${y}" r="${FB_DOT_R}" fill="${col}" class="note-dot" data-note="${n}" data-string="${s}" data-fret="${f}" style="cursor:pointer;"/>`;
-      svg += `<text x="${x}" y="${y+0.5}" text-anchor="middle" dominant-baseline="central" font-size="${FB_FONT}" fill="#fff" font-family="var(--font-mono)" font-weight="600" style="pointer-events:none;">${n}</text>`;
+      svg += `<text x="${x}" y="${y+0.5}" text-anchor="middle" dominant-baseline="central" font-size="${lblFont}" fill="#fff" font-family="var(--font-mono)" font-weight="600" style="pointer-events:none;">${dotLabel(n)}</text>`;
     }
   }
 
@@ -930,6 +1119,10 @@ var activeTab    = 'minor-pent';
 var currentScale = null;
 var tooltip      = document.getElementById('tooltip');
 var cardPosState = {};
+var showIntervals = false;
+var progression   = [];
+var progBPM       = 100;
+var progBeats     = 4;
 
 function getNoteInfo(note, scale) {
   for (var i = 0; i < scale.notes.length; i++) {
@@ -1105,9 +1298,10 @@ function render() {
         posTabs += `<button class="pos-tab${pi===selIdx?' active':''}" data-chord="${chord.name}" onclick="selectPosition('${chord.name}',${pi})">${positions[pi].label}</button>`;
       }
 
+      var escaped = chord.name.replace(/'/g, "\\'");
       html += `
-        <div class="chord-card" data-chord-name="${chord.name}" data-fretboard-active="0">
-          <div class="cc-top"><span class="cc-numeral">${chord.numeral}</span><span class="chord-name">${chord.name}</span></div>
+        <div class="chord-card" data-chord-name="${chord.name}" data-chord-numeral="${chord.numeral}" data-fretboard-active="0">
+          <div class="cc-top"><span class="cc-numeral">${chord.numeral}</span><span class="chord-name">${chord.name}</span><button class="cc-play" onclick="event.stopPropagation();playChordByName('${escaped}')" title="Play">&#9835;</button><button class="cc-add" onclick="event.stopPropagation();addToProgression('${escaped}','${chord.numeral}')" title="Add to progression">+</button></div>
           <div class="chord-quality">${chord.quality}</div>
           <div class="pos-tabs">${posTabs}</div>
           <div class="pos-diagram-wrap" data-chord="${chord.name}">
@@ -1147,11 +1341,13 @@ function render() {
         <span class="legend-item"><span class="legend-dot root"></span> Root (${scale.root})</span>
         <span class="legend-item"><span class="legend-dot tone"></span> Scale tone</span>
         <span class="legend-item"><span class="legend-dot chord-hl"></span> Chord highlight</span>
+        <button class="legend-toggle${showIntervals ? ' active' : ''}" onclick="toggleIntervals()">Intervals</button>
         <span class="legend-notes">${scale.notes.join(' \u00B7 ')}</span>
-        <span class="hint">Hover notes or chords for detail</span>
+        <span class="hint">Click notes to hear \u00B7 hover for detail</span>
       </div>
       <div class="fretboard-wrap">${renderFretboard(scale)}</div>
       <div class="interval-row">${intervalTags}</div>
+      ${renderProgStrip()}
       ${chordsStripHTML}
     </div>`;
 
@@ -1166,6 +1362,9 @@ function render() {
         for (var j = 0; j < all.length; j++) {
           if (all[j].dataset.note === n) all[j].setAttribute('r', String(FB_DOT_R+3));
         }
+      });
+      dot.addEventListener('click', function() {
+        playNote(parseInt(dot.dataset.string), parseInt(dot.dataset.fret));
       });
       dot.addEventListener('mousemove', positionTooltip);
       dot.addEventListener('mouseleave', function() {
@@ -1197,9 +1396,159 @@ function render() {
   }
 }
 
+// ══════════════════════════════════════════════════════
+//  PROGRESSION BUILDER
+// ══════════════════════════════════════════════════════
+
+function renderProgStrip() {
+  var chips = '';
+  if (progression.length === 0) {
+    chips = '<span class="prog-empty">Click + on chords to build a progression</span>';
+  } else {
+    for (var i = 0; i < progression.length; i++) {
+      var p = progression[i];
+      chips += `<span class="prog-chip" data-prog-idx="${i}" onclick="playProgChord(${i})" onmouseenter="peekProgChord(event,${i})" onmouseleave="hidePeek()"><span class="prog-num">${p.numeral}</span>${p.name}<span class="prog-pos">${p.posLabel || ''}</span><span class="prog-x" onclick="event.stopPropagation();removeFromProgression(${i})">\u00D7</span></span>`;
+    }
+  }
+  var btns = '';
+  if (progression.length > 0) {
+    btns += `<button class="prog-play" onclick="playProgression()">&#9654; Play</button>`;
+    btns += `<button class="prog-clear" onclick="clearProgression()">Clear</button>`;
+  }
+  var beatsOpts = '';
+  for (var b = 1; b <= 8; b++) {
+    beatsOpts += `<option value="${b}"${b === progBeats ? ' selected' : ''}>${b}</option>`;
+  }
+  var tempo = `<div class="prog-tempo"><label>BPM</label><input type="number" min="40" max="240" value="${progBPM}" onchange="setProgBPM(this.value)"><label>Beats</label><select onchange="setProgBeats(this.value)">${beatsOpts}</select></div>`;
+  return `<div class="prog-strip">
+    <div class="prog-header"><span class="prog-label">Progression</span>${btns}${tempo}</div>
+    <div class="prog-chips">${chips}</div>
+  </div>`;
+}
+
+window.addToProgression = function(name, numeral) {
+  var positions = window.__positions[name];
+  var posIdx = cardPosState[name] || 0;
+  posIdx = Math.min(posIdx, positions ? positions.length - 1 : 0);
+  var pos = positions ? positions[posIdx] : null;
+  progression.push({
+    name: name,
+    numeral: numeral,
+    posIdx: posIdx,
+    strings: pos ? pos.strings : null,
+    assignment: pos ? pos.assignment : [],
+    posLabel: pos ? pos.label : '',
+    sublabel: pos ? pos.sublabel : ''
+  });
+  savePrefs();
+  renderProgOnly();
+};
+
+window.removeFromProgression = function(idx) {
+  progression.splice(idx, 1);
+  hidePeek();
+  savePrefs();
+  renderProgOnly();
+};
+
+window.clearProgression = function() {
+  progression = [];
+  savePrefs();
+  renderProgOnly();
+};
+
+function renderProgOnly() {
+  var el = document.querySelector('.prog-strip');
+  if (el) el.outerHTML = renderProgStrip();
+}
+
+window.playChordByName = function(name) {
+  var positions = window.__positions[name];
+  if (!positions) return;
+  var idx = cardPosState[name] || 0;
+  idx = Math.min(idx, positions.length - 1);
+  playChordStrum(positions[idx].assignment);
+};
+
+window.playProgChord = function(idx) {
+  var p = progression[idx];
+  if (!p || !p.assignment || !p.assignment.length) return;
+  playChordStrum(p.assignment);
+};
+
+var peekEl = document.getElementById('prog-peek');
+
+window.peekProgChord = function(e, idx) {
+  var p = progression[idx];
+  if (!p) return;
+  // Show diagram
+  var diagram = p.strings ? renderChordDiagram(p.strings) : '';
+  peekEl.innerHTML = diagram + '<span class="prog-peek-label">' + (p.sublabel || '') + '</span>';
+  peekEl.classList.add('visible');
+  // Position above the chip
+  var rect = e.target.closest('.prog-chip').getBoundingClientRect();
+  var pw = peekEl.offsetWidth, ph = peekEl.offsetHeight;
+  var x = rect.left + rect.width / 2 - pw / 2;
+  var y = rect.top - ph - 8;
+  if (y < 4) y = rect.bottom + 8;
+  if (x + pw > window.innerWidth - 8) x = window.innerWidth - pw - 8;
+  if (x < 4) x = 4;
+  peekEl.style.left = x + 'px';
+  peekEl.style.top = y + 'px';
+  // Highlight on fretboard
+  if (p.assignment && p.assignment.length) highlightChordOnFretboard(p.assignment);
+};
+
+window.hidePeek = function() {
+  peekEl.classList.remove('visible');
+  highlightChordOnFretboard(null);
+};
+
+window.setProgBPM = function(v) {
+  progBPM = Math.max(40, Math.min(240, parseInt(v) || 100));
+  savePrefs();
+};
+window.setProgBeats = function(v) {
+  progBeats = Math.max(1, Math.min(8, parseInt(v) || 4));
+  savePrefs();
+};
+
+window.playProgression = function() {
+  if (!progression.length) return;
+  var ctx = ensureAudio();
+  var beatSec = 60 / progBPM;
+  var t = ctx.currentTime;
+  for (var i = 0; i < progression.length; i++) {
+    var p = progression[i];
+    if (!p.assignment || !p.assignment.length) { t += beatSec * progBeats; continue; }
+    var sorted = p.assignment.slice().sort(function(a, b) { return a.string - b.string; });
+    for (var b = 0; b < progBeats; b++) {
+      var strumT = t + b * beatSec;
+      var vel = b === 0 ? 1.0 : 0.6;
+      for (var j = 0; j < sorted.length; j++) {
+        var midi = fretToMidi(sorted[j].string, sorted[j].fret);
+        playTone(midiToFreq(midi), strumT + j * 0.02, beatSec * 0.85, vel);
+      }
+    }
+    t += beatSec * progBeats;
+  }
+};
+
+window.toggleIntervals = function() {
+  showIntervals = !showIntervals;
+  savePrefs();
+  render();
+};
+
+// ══════════════════════════════════════════════════════
+//  PERSISTENCE
+// ══════════════════════════════════════════════════════
+
 function savePrefs() {
   localStorage.setItem('scaleAtlas', JSON.stringify({
-    tab: activeTab, root: activeRoot, capo: capoFret, sharps: useSharps
+    tab: activeTab, root: activeRoot, capo: capoFret, sharps: useSharps,
+    intervals: showIntervals, progression: progression,
+    bpm: progBPM, beats: progBeats
   }));
 }
 function loadPrefs() {
@@ -1210,6 +1559,10 @@ function loadPrefs() {
     if (p.root) activeRoot = p.root;
     if (typeof p.capo === 'number') capoFret = p.capo;
     if (typeof p.sharps === 'boolean') useSharps = p.sharps;
+    if (typeof p.intervals === 'boolean') showIntervals = p.intervals;
+    if (Array.isArray(p.progression)) progression = p.progression;
+    if (typeof p.bpm === 'number') progBPM = p.bpm;
+    if (typeof p.beats === 'number') progBeats = p.beats;
   } catch(e) {}
 }
 
