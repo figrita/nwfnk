@@ -473,6 +473,250 @@ const SCALES = [
         ]
       }
     ]
+  },
+  {
+    id: 'major',
+    name: 'E major (ionian)',
+    genre: 'Pop-funk / new wave pop',
+    desc: "The foundation of Western music. Bright, resolved, confident. The Police, Blondie, INXS. Every note has a clear harmonic role — no ambiguity, all purpose.",
+    notes: ['E','F#','G#','A','B','C#','D#'],
+    intervals: ['1','2','3','4','5','6','7'],
+    root: 'E',
+    chordSections: [
+      {
+        title: 'Diatonic triads & 7ths',
+        chords: [
+          { name: 'Emaj7',  numeral: 'I\u25B37',     tones: ['E','G#','B','D#'],    desc: 'Bright tonic — home base',          quality: 'major 7th',       shape: 'maj7'     },
+          { name: 'F#m7',   numeral: 'ii7',     tones: ['F#','A','C#','E'],    desc: 'Sweet minor — classic ii–V motion', quality: 'minor 7th',       shape: 'minor7'   },
+          { name: 'G#m7',   numeral: 'iii7',    tones: ['G#','B','D#','F#'],   desc: 'Dark minor — moody substitute for I', quality: 'minor 7th',    shape: 'minor7'   },
+          { name: 'Amaj7',  numeral: 'IV\u25B37',    tones: ['A','C#','E','G#'],    desc: 'Warm subdominant — lift and release', quality: 'major 7th',    shape: 'maj7'     },
+          { name: 'B7',     numeral: 'V7',      tones: ['B','D#','F#','A'],    desc: 'Dominant — drives resolution to I', quality: 'dominant 7th',    shape: 'dom7'     },
+          { name: 'C#m7',   numeral: 'vi7',     tones: ['C#','E','G#','B'],    desc: 'Relative minor — emotional depth',  quality: 'minor 7th',       shape: 'minor7'   },
+        ]
+      },
+      {
+        title: 'Pop-funk voicings',
+        chords: [
+          { name: 'Eadd9',  numeral: 'Iadd9',   tones: ['E','G#','B','F#'],    desc: 'Shimmery pop sparkle — The Police', quality: 'major add9',      shape: 'add9'     },
+          { name: 'Amaj9',  numeral: 'IV\u25B39',    tones: ['A','C#','E','G#','B'],desc: 'Lush IV — dreamy new wave texture', quality: 'major 9th',      shape: 'maj9'     },
+          { name: 'C#m9',   numeral: 'vi9',     tones: ['C#','E','G#','B','D#'],desc: 'Deep emotional color',              quality: 'minor 9th',       shape: 'minor9'   },
+          { name: 'B/E',    numeral: 'V/1',     tones: ['B','D#','F#'],        desc: 'V over pedal — jangly suspension',  quality: 'major over E',    shape: 'major'    },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'natural-minor',
+    name: 'E natural minor (aeolian)',
+    genre: 'Post-punk / dark new wave',
+    desc: "Pure minor — dark, brooding, unresolved. Joy Division, Depeche Mode, Bauhaus. The \u266D7 means no leading tone, so cadences drift rather than resolve. That's the melancholy.",
+    notes: ['E','F#','G','A','B','C','D'],
+    intervals: ['1','2','\u266D3','4','5','\u266D6','\u266D7'],
+    root: 'E',
+    chordSections: [
+      {
+        title: 'Diatonic triads & 7ths',
+        chords: [
+          { name: 'Em7',    numeral: 'i7',      tones: ['E','G','B','D'],      desc: 'Dark tonic — brooding home',        quality: 'minor 7th',       shape: 'minor7'   },
+          { name: 'Gmaj7',  numeral: '\u266DIII\u25B37',  tones: ['G','B','D','F#'],     desc: 'Relative major — bright escape',    quality: 'major 7th',       shape: 'maj7'     },
+          { name: 'Am7',    numeral: 'iv7',     tones: ['A','C','E','G'],      desc: 'Subdominant — deepens the dark',    quality: 'minor 7th',       shape: 'minor7'   },
+          { name: 'Bm7',    numeral: 'v7',      tones: ['B','D','F#','A'],     desc: 'Minor v — no pull, just drift',     quality: 'minor 7th',       shape: 'minor7'   },
+          { name: 'C',      numeral: '\u266DVI',     tones: ['C','E','G'],          desc: 'Deceptive brightness — classic move', quality: 'major',          shape: 'major'    },
+          { name: 'D',      numeral: '\u266DVII',    tones: ['D','F#','A'],         desc: 'Subtonic — modal resolution',       quality: 'major',           shape: 'major'    },
+        ]
+      },
+      {
+        title: 'Dark new wave voicings',
+        chords: [
+          { name: 'Em9',    numeral: 'i9',      tones: ['E','G','B','D','F#'], desc: 'Atmospheric tonic — Joy Division space', quality: 'minor 9th',   shape: 'minor9'   },
+          { name: 'Cmaj7',  numeral: '\u266DVI\u25B37',   tones: ['C','E','G','B'],      desc: 'Haunting brightness — Depeche Mode', quality: 'major 7th',    shape: 'maj7'     },
+          { name: 'Am9',    numeral: 'iv9',     tones: ['A','C','E','G','B'],  desc: 'Deep minor wash',                   quality: 'minor 9th',       shape: 'minor9'   },
+          { name: 'D/E',    numeral: '\u266DVII/1',  tones: ['D','F#','A'],         desc: 'Ambiguous pedal — neither here nor there', quality: 'major over E', shape: 'major' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'harmonic-minor',
+    name: 'E harmonic minor',
+    genre: 'Gothic new wave / dark funk',
+    desc: "Natural minor with a raised 7th (D#). Creates a leading tone that pulls to the root, plus that dramatic augmented 2nd gap (C to D#). Siouxsie, gothic rock, dramatic tension.",
+    notes: ['E','F#','G','A','B','C','D#'],
+    intervals: ['1','2','\u266D3','4','5','\u266D6','7'],
+    root: 'E',
+    chordSections: [
+      {
+        title: 'Diatonic triads & 7ths',
+        chords: [
+          { name: 'Em(maj7)', numeral: 'i(\u25B37)',  tones: ['E','G','B','D#'],     desc: 'Tonic with tension — the leading tone bites', quality: 'minor-major 7th', shape: 'minmaj7' },
+          { name: 'Am7',    numeral: 'iv7',     tones: ['A','C','E','G'],      desc: 'Subdominant — familiar minor pull', quality: 'minor 7th',       shape: 'minor7'   },
+          { name: 'B7',     numeral: 'V7',      tones: ['B','D#','F#','A'],    desc: 'DOMINANT V — this is why the scale exists', quality: 'dominant 7th', shape: 'dom7'   },
+          { name: 'C+',     numeral: '\u266DIII+',   tones: ['C','E','G#'],         desc: 'Augmented — eerie and unstable',    quality: 'augmented',       shape: 'aug'      },
+          { name: 'G#dim7', numeral: 'vii\u00B07',  tones: ['G#','B','D','F'],     desc: 'Fully diminished — maximum tension', quality: 'diminished 7th', shape: 'dim7'     },
+        ]
+      },
+      {
+        title: 'Gothic voicings',
+        chords: [
+          { name: 'B7b9',   numeral: 'V7\u266D9',   tones: ['B','D#','F#','A','C'],desc: 'V7\u266D9 — sinister resolution',        quality: 'dominant 7\u266D9',    shape: 'dom7b9'   },
+          { name: 'Am',     numeral: 'iv',      tones: ['A','C','E'],          desc: 'Simple minor iv — grounding',       quality: 'minor',           shape: 'minor'    },
+          { name: 'Em',     numeral: 'i',       tones: ['E','G','B'],          desc: 'Clean minor triad — let it breathe', quality: 'minor',          shape: 'minor'    },
+          { name: 'C',      numeral: '\u266DVI',     tones: ['C','E','G'],          desc: 'Borrowed brightness — dramatic contrast', quality: 'major',     shape: 'major'    },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'melodic-minor',
+    name: 'E melodic minor',
+    genre: 'Jazz-funk / sophisticated',
+    desc: "Minor with raised 6th and 7th (C# and D#). Smooths out the harmonic minor's awkward gap. Jazz-funk fusion, Wayne Shorter, Herbie Hancock. Sophisticated and slippery.",
+    notes: ['E','F#','G','A','B','C#','D#'],
+    intervals: ['1','2','\u266D3','4','5','6','7'],
+    root: 'E',
+    chordSections: [
+      {
+        title: 'Primary harmony',
+        chords: [
+          { name: 'Em(maj7)', numeral: 'i(\u25B37)',  tones: ['E','G','B','D#'],     desc: 'Minor-major tonic — jazzy and tense', quality: 'minor-major 7th', shape: 'minmaj7' },
+          { name: 'F#m7',   numeral: 'ii7',     tones: ['F#','A','C#','E'],    desc: 'Dorian ii — smooth and familiar',   quality: 'minor 7th',       shape: 'minor7'   },
+          { name: 'Gmaj7#5', numeral: '\u266DIII\u25B37\u266F5', tones: ['G','B','D#','F#'], desc: 'Augmented major 7 — dreamy and alien', quality: 'augmented maj7', shape: 'augmaj7' },
+          { name: 'A7',     numeral: 'IV7',     tones: ['A','C#','E','G'],     desc: 'Lydian dominant sound — floating',  quality: 'dominant 7th',    shape: 'dom7'     },
+          { name: 'B7',     numeral: 'V7',      tones: ['B','D#','F#','A'],    desc: 'Strong dominant — resolves cleanly', quality: 'dominant 7th',   shape: 'dom7'     },
+          { name: 'C#m7b5', numeral: 'vi\u00F87',   tones: ['C#','E','G','B'],     desc: 'Half-diminished — dark jazz color', quality: 'half-diminished', shape: 'halfdim7' },
+        ]
+      },
+      {
+        title: 'Jazz-funk extensions',
+        chords: [
+          { name: 'Em9(maj7)', numeral: 'i9(\u25B37)', tones: ['E','G','B','D#','F#'], desc: 'Lush tonic — Wayne Shorter territory', quality: 'minor-maj 9th', shape: 'minmaj7' },
+          { name: 'A9',     numeral: 'IV9',     tones: ['A','C#','E','G','B'], desc: 'Lydian dominant 9 — floating funk',  quality: 'dominant 9th',   shape: 'dom9'     },
+          { name: 'B13',    numeral: 'V13',     tones: ['B','D#','F#','A','G#'],desc: 'Rich dominant — full jazz resolution', quality: 'dominant 13th', shape: 'dom13'    },
+          { name: 'F#m9',   numeral: 'ii9',     tones: ['F#','A','C#','E','G#'],desc: 'Silky ii — Herbie Hancock smoothness', quality: 'minor 9th',    shape: 'minor9'   },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'phrygian',
+    name: 'E phrygian',
+    genre: 'Dark post-punk / gothic',
+    desc: "The darkest common mode — that \u266D2 (F natural) is the sound of menace. Bauhaus, Killing Joke, Siouxsie. The half-step from root creates instant tension. Spanish-tinged darkness.",
+    notes: ['E','F','G','A','B','C','D'],
+    intervals: ['1','\u266D2','\u266D3','4','5','\u266D6','\u266D7'],
+    root: 'E',
+    chordSections: [
+      {
+        title: 'Diatonic triads & 7ths',
+        chords: [
+          { name: 'Em7',    numeral: 'i7',      tones: ['E','G','B','D'],      desc: 'Dark tonic — home in the shadows',  quality: 'minor 7th',       shape: 'minor7'   },
+          { name: 'F',      numeral: '\u266DII',     tones: ['F','A','C'],          desc: 'THE Phrygian chord — half-step menace', quality: 'major',      shape: 'major'    },
+          { name: 'Gmaj7',  numeral: '\u266DIII\u25B37',  tones: ['G','B','D','F#'],     desc: 'Relative major — fleeting brightness', quality: 'major 7th',   shape: 'maj7'     },
+          { name: 'Am7',    numeral: 'iv7',     tones: ['A','C','E','G'],      desc: 'Minor subdominant — deepening',     quality: 'minor 7th',       shape: 'minor7'   },
+          { name: 'Bdim',   numeral: 'v\u00B0',     tones: ['B','D','F'],          desc: 'Diminished v — unstable tension',   quality: 'diminished',      shape: 'dim'      },
+          { name: 'Dm7',    numeral: '\u266DVII7',   tones: ['D','F','A','C'],      desc: 'Subtonic minor — drifting cadence', quality: 'minor 7th',       shape: 'minor7'   },
+        ]
+      },
+      {
+        title: 'Dark voicings',
+        chords: [
+          { name: 'Em',     numeral: 'i',       tones: ['E','G','B'],          desc: 'Raw minor triad — stark and open',  quality: 'minor',           shape: 'minor'    },
+          { name: 'Fmaj7',  numeral: '\u266DII\u25B37',   tones: ['F','A','C','E'],      desc: 'Haunting \u266DII — Killing Joke tension', quality: 'major 7th',    shape: 'maj7'     },
+          { name: 'Am',     numeral: 'iv',      tones: ['A','C','E'],          desc: 'Simple minor iv — gothic grounding', quality: 'minor',          shape: 'minor'    },
+          { name: 'F/E',    numeral: '\u266DII/1',   tones: ['F','A','C'],          desc: '\u266DII over pedal — maximum Phrygian vibe', quality: 'major over E', shape: 'major' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'phrygian-dom',
+    name: 'E phrygian dominant',
+    genre: 'Surf-punk / dark exotica',
+    desc: "5th mode of A harmonic minor. Phrygian but with a major 3rd (G#) — the Spanish/Middle-Eastern sound. Dick Dale, The Cramps, surf-noir. That \u266D2 to major 3rd leap is instantly recognizable.",
+    notes: ['E','F','G#','A','B','C','D'],
+    intervals: ['1','\u266D2','3','4','5','\u266D6','\u266D7'],
+    root: 'E',
+    chordSections: [
+      {
+        title: 'Primary harmony',
+        chords: [
+          { name: 'E7',     numeral: 'I7',      tones: ['E','G#','B','D'],     desc: 'Dominant tonic — tense home base',  quality: 'dominant 7th',    shape: 'dom7'     },
+          { name: 'F',      numeral: '\u266DII',     tones: ['F','A','C'],          desc: 'Half-step upper neighbor — the menace', quality: 'major',      shape: 'major'    },
+          { name: 'Am',     numeral: 'iv',      tones: ['A','C','E'],          desc: 'Minor iv — Spanish cadence target', quality: 'minor',           shape: 'minor'    },
+          { name: 'Bdim',   numeral: 'v\u00B0',     tones: ['B','D','F'],          desc: 'Diminished — dark passing chord',   quality: 'diminished',      shape: 'dim'      },
+          { name: 'Dm7',    numeral: '\u266DVII7',   tones: ['D','F','A','C'],      desc: 'Minor subtonic — modal drift',      quality: 'minor 7th',       shape: 'minor7'   },
+        ]
+      },
+      {
+        title: 'Surf-noir voicings',
+        chords: [
+          { name: 'E7b9',   numeral: 'I7\u266D9',   tones: ['E','G#','B','D','F'], desc: 'Dick Dale special — surf menace',   quality: 'dominant 7\u266D9',    shape: 'dom7b9'   },
+          { name: 'Fmaj7',  numeral: '\u266DII\u25B37',   tones: ['F','A','C','E'],      desc: 'Lush \u266DII — cinematic tension',      quality: 'major 7th',       shape: 'maj7'     },
+          { name: 'Am7',    numeral: 'iv7',     tones: ['A','C','E','G'],      desc: 'Minor 7th — smooth Spanish color',  quality: 'minor 7th',       shape: 'minor7'   },
+          { name: 'E7#9',   numeral: 'I7\u266F9',   tones: ['E','G#','B','D','G'], desc: 'Hendrix chord — gritty surf-funk',  quality: 'dominant 7\u266F9',    shape: 'dom7s9'   },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'lydian',
+    name: 'E lydian',
+    genre: 'Dreamy new wave / art-pop',
+    desc: "Major scale with a raised 4th (A#). Floating, otherworldly, unresolved. Andy Summers, Steve Vai, dream pop. The #4 lifts everything — no pull toward the subdominant, just weightlessness.",
+    notes: ['E','F#','G#','A#','B','C#','D#'],
+    intervals: ['1','2','3','\u266F4','5','6','7'],
+    root: 'E',
+    chordSections: [
+      {
+        title: 'Diatonic triads & 7ths',
+        chords: [
+          { name: 'Emaj7',  numeral: 'I\u25B37',     tones: ['E','G#','B','D#'],    desc: 'Floating tonic — dreamy home',      quality: 'major 7th',       shape: 'maj7'     },
+          { name: 'F#7',    numeral: 'II7',     tones: ['F#','A#','C#','E'],   desc: 'THE Lydian chord — major II7 confirms the mode', quality: 'dominant 7th', shape: 'dom7' },
+          { name: 'G#m7',   numeral: 'iii7',    tones: ['G#','B','D#','F#'],   desc: 'Minor iii — emotional undertow',    quality: 'minor 7th',       shape: 'minor7'   },
+          { name: 'A#m7b5', numeral: '\u266F iv\u00F87',  tones: ['A#','C#','E','G#'],   desc: 'Half-diminished — the raised 4th chord', quality: 'half-diminished', shape: 'halfdim7' },
+          { name: 'Bmaj7',  numeral: 'V\u25B37',     tones: ['B','D#','F#','A#'],   desc: 'Bright dominant area — no real pull', quality: 'major 7th',     shape: 'maj7'     },
+          { name: 'C#m7',   numeral: 'vi7',     tones: ['C#','E','G#','B'],    desc: 'Relative minor — grounding darkness', quality: 'minor 7th',      shape: 'minor7'   },
+        ]
+      },
+      {
+        title: 'Dreamy voicings',
+        chords: [
+          { name: 'Emaj9',  numeral: 'I\u25B39',     tones: ['E','G#','B','D#','F#'],desc: 'Lush floating tonic — pure dream pop', quality: 'major 9th',   shape: 'maj9'     },
+          { name: 'F#9',    numeral: 'II9',     tones: ['F#','A#','C#','E','G#'],desc: 'Lydian color chord — weightless',   quality: 'dominant 9th',    shape: 'dom9'     },
+          { name: 'Eadd9',  numeral: 'Iadd9',   tones: ['E','G#','B','F#'],    desc: 'Shimmery — Andy Summers jangle',    quality: 'major add9',      shape: 'add9'     },
+          { name: 'B/E',    numeral: 'V/1',     tones: ['B','D#','F#'],        desc: 'V over pedal — suspended in air',   quality: 'major over E',    shape: 'major'    },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'whole-tone',
+    name: 'E whole tone',
+    genre: 'Art-funk / experimental',
+    desc: "Every note a whole step apart — six notes, completely symmetrical. No tension, no resolution, just floating. Debussy meets Bowie. Use sparingly for dreamlike, dissolving moments.",
+    notes: ['E','F#','G#','A#','C','D'],
+    intervals: ['1','2','3','\u266F4','\u266F5','\u266D7'],
+    root: 'E',
+    chordSections: [
+      {
+        title: 'Whole-tone harmony',
+        chords: [
+          { name: 'Eaug',   numeral: 'I+',      tones: ['E','G#','C'],         desc: 'Augmented tonic — the only triad that fits', quality: 'augmented',  shape: 'aug'      },
+          { name: 'E7#5',   numeral: 'I7\u266F5',   tones: ['E','G#','C','D'],     desc: 'Augmented dominant — unstable and dreamy', quality: 'dominant 7\u266F5', shape: 'dom7s5' },
+          { name: 'F#aug',  numeral: 'II+',     tones: ['F#','A#','D'],        desc: 'Same shape, different root — symmetry', quality: 'augmented',     shape: 'aug'      },
+          { name: 'G#7#5',  numeral: 'III7\u266F5',  tones: ['G#','C','E','F#'],    desc: 'Another augmented dominant — all equivalent', quality: 'dominant 7\u266F5', shape: 'dom7s5' },
+        ]
+      },
+      {
+        title: 'Atmospheric voicings',
+        chords: [
+          { name: 'E9#5',   numeral: 'I9\u266F5',   tones: ['E','G#','C','D','F#'],desc: 'Dreamy 9th — dissolving texture',   quality: 'dominant 9\u266F5',    shape: 'dom9'     },
+          { name: 'Eaug/G#',numeral: 'I+/3',    tones: ['E','G#','C'],         desc: 'Inversion — different bass, same float', quality: 'augmented inv', shape: 'aug'     },
+          { name: 'A#aug',  numeral: '\u266F IV+',    tones: ['A#','D','F#'],        desc: 'Tritone sub — same notes, different angle', quality: 'augmented',  shape: 'aug'      },
+          { name: 'Daug',   numeral: '\u266DVII+',   tones: ['D','F#','A#'],        desc: 'Completing the cycle — back to start', quality: 'augmented',     shape: 'aug'      },
+        ]
+      }
+    ]
   }
 ];
 
@@ -732,6 +976,44 @@ const SHAPE_TEMPLATES = {
     { label:'4-str',   semis:[0,3,6,9],         ss:[2,3,4,5],     span:5 },
     { label:'4-str',   semis:[0,3,6,9],         ss:[0,1,2,3],     span:5 },
   ],
+  dim: [
+    { label:'Triad',   semis:[0,3,6],           ss:[1,2,3],       span:5 },
+    { label:'Triad',   semis:[0,3,6],           ss:[2,3,4],       span:5 },
+    { label:'Triad',   semis:[0,3,6],           ss:[3,4,5],       span:5 },
+    { label:'4-str',   semis:[0,3,6,12],        ss:[1,2,3,4],     span:5 },
+    { label:'4-str',   semis:[0,3,6,12],        ss:[2,3,4,5],     span:5 },
+  ],
+  aug: [
+    { label:'Triad',   semis:[0,4,8],           ss:[1,2,3],       span:5 },
+    { label:'Triad',   semis:[0,4,8],           ss:[2,3,4],       span:5 },
+    { label:'Triad',   semis:[0,4,8],           ss:[3,4,5],       span:5 },
+    { label:'4-str',   semis:[0,4,8,12],        ss:[1,2,3,4],     span:5 },
+    { label:'4-str',   semis:[0,4,8,12],        ss:[2,3,4,5],     span:5 },
+  ],
+  halfdim7: [
+    { label:'4-str',   semis:[0,3,6,10],        ss:[1,2,3,4],     span:5 },
+    { label:'4-str',   semis:[0,3,6,10],        ss:[2,3,4,5],     span:5 },
+    { label:'5-str',   semis:[0,6,10,15,18],    ss:[0,1,2,3,4],   span:5 },
+    { label:'5-str',   semis:[0,6,10,15,18],    ss:[1,2,3,4,5],   span:5 },
+  ],
+  minmaj7: [
+    { label:'E shape', semis:[0,7,11,15,19,24], ss:[0,1,2,3,4,5], span:4 },
+    { label:'A shape', semis:[0,7,11,15,19],    ss:[1,2,3,4,5],   span:5 },
+    { label:'4-str',   semis:[0,7,11,15],       ss:[1,2,3,4],     span:5 },
+    { label:'4-str',   semis:[0,7,11,15],       ss:[2,3,4,5],     span:5 },
+  ],
+  augmaj7: [
+    { label:'4-str',   semis:[0,4,8,11],        ss:[1,2,3,4],     span:5 },
+    { label:'4-str',   semis:[0,4,8,11],        ss:[2,3,4,5],     span:5 },
+    { label:'5-str',   semis:[0,8,11,16,20],    ss:[0,1,2,3,4],   span:5 },
+    { label:'5-str',   semis:[0,8,11,16,20],    ss:[1,2,3,4,5],   span:5 },
+  ],
+  dom7s5: [
+    { label:'4-str',   semis:[0,4,8,10],        ss:[1,2,3,4],     span:5 },
+    { label:'4-str',   semis:[0,4,8,10],        ss:[2,3,4,5],     span:5 },
+    { label:'5-str',   semis:[0,8,10,16,20],    ss:[0,1,2,3,4],   span:5 },
+    { label:'5-str',   semis:[0,8,10,16,20],    ss:[1,2,3,4,5],   span:5 },
+  ],
 };
 
 // ── Known voicings — real shapes guitarists actually play ──
@@ -792,6 +1074,71 @@ const KNOWN_VOICINGS = {
 
   // Hendrix chord
   'E7#9':  [['0','2','0','1','3','3','Hendrix shape']],
+
+  // Diminished
+  'Bdim':  [['x','2','3','4','3','x','Bdim shape']],
+  'Bdim7': [['x','2','3','1','3','1','Bdim7 shape']],
+  'G#dim7':[['x','x','0','1','0','1','G#dim7 shape']],
+
+  // Augmented
+  'Eaug':  [['0','3','2','1','1','0','Eaug shape']],
+  'C+':    [['x','3','2','1','1','0','C+ shape']],
+  'F#aug': [['2','x','4','3','3','x','F#aug shape']],
+  'Daug':  [['x','x','0','3','3','2','Daug shape']],
+
+  // Half-diminished
+  'C#m7b5':[['x','4','5','4','5','x','C#m7b5 shape']],
+  'A#m7b5':[['x','1','2','1','2','x','A#m7b5 shape']],
+
+  // Minor-major 7th
+  'Em(maj7)':[['0','2','1','0','0','0','Em(maj7) shape']],
+
+  // Augmented major 7th
+  'Gmaj7#5':[['3','x','4','4','4','x','Gmaj7#5 shape']],
+
+  // Dominant 7#5
+  'E7#5':  [['0','3','0','1','1','0','E7#5 shape']],
+  'G#7#5': [['4','x','4','5','5','x','G#7#5 shape']],
+
+  // Dominant 7b9
+  'E7b9':  [['0','2','0','1','0','1','E7b9 shape']],
+  'B7b9':  [['x','2','1','2','0','1','B7b9 shape']],
+
+  // Additional major 7th
+  'Bmaj7': [['x','2','4','3','4','2','Bmaj7 barre']],
+
+  // Additional minor 7th
+  'G#m7':  [['4','6','4','4','4','4','Em7 barre']],
+  'Dm7':   [['x','x','0','2','1','1','Dm7 shape']],
+
+  // 9ths & extensions
+  'Eadd9': [['0','2','2','1','0','2','Eadd9 shape']],
+  'Emaj9': [['0','2','1','1','0','2','Emaj9 shape']],
+  'Am9':   [['x','0','2','4','1','3','Am9 shape']],
+  'C#m9':  [['x','4','6','6','4','4','C#m9 shape']],
+  'F#m9':  [['2','4','2','2','4','2','F#m9 shape']],
+  'D9':    [['x','x','0','2','1','2','D9 shape']],
+  'Dmaj9': [['x','x','0','2','2','4','Dmaj9 shape']],
+  'Amaj9': [['x','0','2','1','2','4','Amaj9 shape']],
+  'F#7':   [['2','4','2','3','2','2','E7 barre']],
+  'F#9':   [['2','4','2','3','2','4','E9 barre']],
+  'B13':   [['x','2','1','2','2','2','B13 shape']],
+  'E13':   [['0','2','0','1','2','0','E13 shape']],
+  'E5':    [['0','2','2','x','x','x','E5 shape']],
+
+  // Sus & slash voicings
+  'A7sus4':[['x','0','2','0','3','0','A7sus4 shape']],
+  'G6':    [['3','2','0','0','0','0','G6 shape']],
+  'A/E':   [['0','0','2','2','2','0','A/E shape']],
+  'B/E':   [['0','2','4','4','4','0','B/E shape']],
+  'D/E':   [['0','x','0','2','3','2','D/E shape']],
+  'F/E':   [['0','x','3','2','1','1','F/E shape']],
+
+  // Whole-tone special
+  'E9#5':  [['0','3','0','1','1','2','E9#5 shape']],
+  'Eaug/G#':[['4','3','2','1','1','0','Eaug inv']],
+  'A#aug': [['x','1','0','3','3','2','A#aug shape']],
+  'Em9(maj7)':[['0','2','1','0','0','2','Em9(maj7) shape']],
 };
 
 function knownToPosition(entry) {
