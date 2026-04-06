@@ -136,7 +136,6 @@
   }
   .pos-btn.active .pos-frets { color: rgba(255,248,240,0.6); }
 
-
   .chords-strip { width: 100%; padding: 8px 28px 16px; }
   .chords-strip-label { font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--text-tertiary); margin-bottom: 4px; }
   .chord-grid { display: flex; flex-direction: column; gap: 6px; }
@@ -914,7 +913,7 @@ const SHAPE_TEMPLATES = {
     { label:'Triad',   semis:[0,3,7],           ss:[0,1,2],       span:5 },
   ],
   maj7: [
-    { label:'E shape', semis:[0,11,16,19,23],   ss:[0,1,2,3,4],   span:4 },
+    { label:'E shape', semis:[0,7,11,16,19,24], ss:[0,1,2,3,4,5], span:4 },
     { label:'A shape', semis:[0,7,11,16,19],    ss:[1,2,3,4,5],   span:5 },
     { label:'4-str',   semis:[0,7,11,16],       ss:[1,2,3,4],     span:5 },
     { label:'4-str',   semis:[0,7,11,16],       ss:[2,3,4,5],     span:5 },
@@ -1116,10 +1115,9 @@ const KNOWN_VOICINGS = {
   'Emaj9': [['0','2','1','1','0','2','Emaj9 shape']],
   'Am9':   [['x','0','2','4','1','3','Am9 shape']],
   'C#m9':  [['x','4','6','6','4','4','C#m9 shape']],
-  'F#m9':  [['2','4','2','2','4','2','F#m9 shape']],
-  'D9':    [['x','x','0','2','1','2','D9 shape']],
-  'Dmaj9': [['x','x','0','2','2','4','Dmaj9 shape']],
-  'Amaj9': [['x','0','2','1','2','4','Amaj9 shape']],
+  'D9':    [['x','x','0','2','1','0','D9 shape']],
+  'Dmaj9': [['x','x','0','2','2','0','Dmaj9 shape']],
+  'Amaj9': [['x','0','2','1','0','0','Amaj9 shape']],
   'F#7':   [['2','4','2','3','2','2','E7 barre']],
   'F#9':   [['2','4','2','3','2','4','E9 barre']],
   'B13':   [['x','2','1','2','2','2','B13 shape']],
@@ -1146,33 +1144,30 @@ function knownToPosition(entry) {
   var sublabel = entry[6];
   var assignment = [];
   var playedFrets = [];
-  // Shift known voicings by capo: fret numbers become relative to capo
-  var shifted = [];
+  var capoMin = Math.max(0, capoFret);
+  
   for (var s = 0; s < 6; s++) {
-    if (strings[s] === 'x') { shifted.push('x'); continue; }
-    var f = parseInt(strings[s]) + Math.max(0, capoFret);
-    shifted.push(String(f));
-  }
-  // For positive capo, known voicings with open strings (fret 0) become played at the capo fret
-  for (var s = 0; s < 6; s++) {
-    if (shifted[s] !== 'x') {
-      var f = parseInt(shifted[s]);
+    if (strings[s] !== 'x') {
+      var f = parseInt(strings[s]);
+      if (f < capoMin) return null; // Unplayable with current positive capo
       playedFrets.push(f);
       assignment.push({ string: s, fret: f, note: noteAtFret(s, f) });
     }
   }
+  
   var minF = playedFrets.length ? Math.min.apply(null, playedFrets) : 0;
   var maxF = playedFrets.length ? Math.max.apply(null, playedFrets) : 0;
   if (maxF > FRET_COUNT) return null;
-  var capoMin = Math.max(0, capoFret);
+  
   var dispLabel;
   if (minF <= capoMin) dispLabel = 'Open';
   else dispLabel = 'Fr ' + minF;
+  
   return {
-    sig: shifted.join(','),
+    sig: strings.join(','),
     label: dispLabel,
     sublabel: sublabel,
-    strings: shifted,
+    strings: strings,
     assignment: assignment,
     minFret: minF,
     maxFret: maxF,
@@ -1334,8 +1329,8 @@ function renderFretboard(scale) {
     svg += `<text x="${mx}" y="${my+14}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.4)" font-family="var(--font-mono)">${m}</text>`;
   }
 
-  var rootCol = '#D4614A';
-  var toneCol = '#6AAF96';
+  var rootCol = 'var(--root-color)';
+  var toneCol = 'var(--tone-color)';
   var capoMin = Math.max(0, capoFret);
   var posBox = (activePosition >= 0 && activePosition < scalePositions.length) ? scalePositions[activePosition] : null;
 
@@ -1707,7 +1702,7 @@ function render() {
     tuningNotes.push(dn[(OPEN_MIDI[i] + capoFret + 120) % 12]);
   }
   var tuningStr = tuningNotes.join(' ');
-  var tuningDesc = capoFret === 0 ? 'Standard' : (capoFret > 0 ? 'Capo ' + capoFret : 'Drop ' + Math.abs(capoFret));
+  var tuningDesc = capoFret === 0 ? 'Standard' : (capoFret > 0 ? 'Capo ' + capoFret : 'Down ' + Math.abs(capoFret));
   document.getElementById('tuning-label').textContent = tuningStr + ' · ' + tuningDesc;
 
   var semitones = (noteIdx(activeRoot) - BASE_ROOT_IDX + 12) % 12;
