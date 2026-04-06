@@ -210,7 +210,7 @@
     font-family: var(--font-mono); font-size: 12px; font-weight: 500;
     padding: 4px 10px; border-radius: 5px;
     background: var(--bg-card); border: 1.5px solid var(--border);
-    color: var(--text-primary); cursor: pointer; transition: all 0.12s;
+    color: var(--text-primary); cursor: pointer; transition: all 0.12s; user-select: none;
     display: flex; align-items: center; gap: 6px;
   }
   .prog-chip:hover { border-color: var(--root-color); }
@@ -225,6 +225,10 @@
     font-size: 9px; color: var(--text-tertiary); font-weight: 400;
   }
   .prog-chip:hover { border-color: var(--seafoam); background: var(--bg-card-hover); }
+  .prog-chip[draggable="true"] { cursor: grab; }
+  .prog-chip.dragging { opacity: 0.3; }
+  .prog-chip.drag-over-left { box-shadow: -3px 0 0 0 var(--seafoam); }
+  .prog-chip.drag-over-right { box-shadow: 3px 0 0 0 var(--seafoam); }
   .prog-peek {
     display: none; position: fixed; z-index: 900;
     background: #FFFDF8; border: 1.5px solid var(--border); border-radius: 8px;
@@ -1523,7 +1527,7 @@ function renderProgStrip() {
   } else {
     for (var i = 0; i < progression.length; i++) {
       var p = progression[i];
-      chips += `<span class="prog-chip" data-prog-idx="${i}" onclick="playProgChord(${i})" onmouseenter="peekProgChord(event,${i})" onmouseleave="hidePeek()"><span class="prog-num">${p.numeral}</span>${p.name}<span class="prog-pos">${p.posLabel || ''}</span><span class="prog-x" onclick="event.stopPropagation();removeFromProgression(${i})">\u00D7</span></span>`;
+      chips += `<span class="prog-chip" data-prog-idx="${i}" draggable="true" ondragstart="progDragStart(event,${i})" ondragover="progDragOver(event,${i})" ondragleave="progDragLeave(event)" ondrop="progDrop(event,${i})" ondragend="progDragEnd(event)" onclick="playProgChord(${i})" onmouseenter="peekProgChord(event,${i})" onmouseleave="hidePeek()"><span class="prog-num">${p.numeral}</span>${p.name}<span class="prog-pos">${p.posLabel || ''}</span><span class="prog-x" onclick="event.stopPropagation();removeFromProgression(${i})">\u00D7</span></span>`;
     }
   }
   var btns = '';
@@ -1571,6 +1575,58 @@ window.clearProgression = function() {
   progression = [];
   savePrefs();
   renderProgOnly();
+};
+
+var progDragIdx = -1;
+
+window.progDragStart = function(e, idx) {
+  progDragIdx = idx;
+  e.dataTransfer.effectAllowed = 'move';
+  e.target.closest('.prog-chip').classList.add('dragging');
+  hidePeek();
+};
+
+window.progDragOver = function(e, idx) {
+  if (progDragIdx < 0 || progDragIdx === idx) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  var chip = e.target.closest('.prog-chip');
+  // Determine left/right half for insert indicator
+  var rect = chip.getBoundingClientRect();
+  var mid = rect.left + rect.width / 2;
+  chip.classList.remove('drag-over-left', 'drag-over-right');
+  chip.classList.add(e.clientX < mid ? 'drag-over-left' : 'drag-over-right');
+};
+
+window.progDragLeave = function(e) {
+  var chip = e.target.closest('.prog-chip');
+  if (chip) chip.classList.remove('drag-over-left', 'drag-over-right');
+};
+
+window.progDrop = function(e, targetIdx) {
+  e.preventDefault();
+  var chip = e.target.closest('.prog-chip');
+  if (chip) chip.classList.remove('drag-over-left', 'drag-over-right');
+  if (progDragIdx < 0 || progDragIdx === targetIdx) return;
+  // Determine insert position based on drop side
+  var rect = chip.getBoundingClientRect();
+  var insertBefore = e.clientX < rect.left + rect.width / 2;
+  var item = progression.splice(progDragIdx, 1)[0];
+  // Adjust target index after removal
+  var newIdx = targetIdx;
+  if (progDragIdx < targetIdx) newIdx--;
+  if (!insertBefore) newIdx++;
+  progression.splice(newIdx, 0, item);
+  progDragIdx = -1;
+  savePrefs();
+  renderProgOnly();
+};
+
+window.progDragEnd = function(e) {
+  progDragIdx = -1;
+  document.querySelectorAll('.prog-chip').forEach(function(c) {
+    c.classList.remove('dragging', 'drag-over-left', 'drag-over-right');
+  });
 };
 
 function renderProgOnly() {
