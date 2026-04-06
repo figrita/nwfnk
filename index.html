@@ -550,8 +550,8 @@ const SCALES = [
           { name: 'Em(maj7)', numeral: 'i(\u25B37)',  tones: ['E','G','B','D#'],     desc: 'Tonic with tension — the leading tone bites', quality: 'minor-major 7th', shape: 'minmaj7' },
           { name: 'Am7',    numeral: 'iv7',     tones: ['A','C','E','G'],      desc: 'Subdominant — familiar minor pull', quality: 'minor 7th',       shape: 'minor7'   },
           { name: 'B7',     numeral: 'V7',      tones: ['B','D#','F#','A'],    desc: 'DOMINANT V — this is why the scale exists', quality: 'dominant 7th', shape: 'dom7'   },
-          { name: 'G+',     numeral: 'III+',    tones: ['G','B','D#'],         desc: 'Augmented — eerie and unstable',    quality: 'augmented',       shape: 'aug'      },
-          { name: 'D#dim7', numeral: 'vii\u00B07',  tones: ['D#','F#','A','C'],    desc: 'Fully diminished — maximum tension', quality: 'diminished 7th', shape: 'dim7'     },
+          { name: 'G+',     numeral: '\u266DIII+',   tones: ['G','B','D#'],         desc: 'Augmented \u2014 eerie and unstable',    quality: 'augmented',       shape: 'aug'      },
+          { name: 'D#dim7', numeral: 'vii\u00B07',  tones: ['D#','F#','A','C'],    desc: 'Fully diminished \u2014 maximum tension', quality: 'diminished 7th', shape: 'dim7'     },
         ]
       },
       {
@@ -590,7 +590,7 @@ const SCALES = [
         chords: [
           { name: 'Em9(maj7)', numeral: 'i9(\u25B37)', tones: ['E','G','B','D#','F#'], desc: 'Lush tonic — Wayne Shorter territory', quality: 'minor-maj 9th', shape: 'minmaj7' },
           { name: 'A9',     numeral: 'IV9',     tones: ['A','C#','E','G','B'], desc: 'Lydian dominant 9 — floating funk',  quality: 'dominant 9th',   shape: 'dom9'     },
-          { name: 'B13',    numeral: 'V13',     tones: ['B','D#','F#','A','C#','G#'],desc: 'Rich dominant — full jazz resolution', quality: 'dominant 13th', shape: 'dom13'    },
+          { name: 'B13',    numeral: 'V13',     tones: ['B','D#','F#','A','C#','G#'],desc: 'Rich dominant \u2014 full jazz resolution', quality: 'dominant 13th', shape: 'dom13'    },
           { name: 'F#m9',   numeral: 'ii9',     tones: ['F#','A','C#','E','G#'],desc: 'Silky ii — Herbie Hancock smoothness', quality: 'minor 9th',    shape: 'minor9'   },
         ]
       }
@@ -610,7 +610,7 @@ const SCALES = [
         chords: [
           { name: 'Em7',    numeral: 'i7',      tones: ['E','G','B','D'],      desc: 'Dark tonic — home in the shadows',  quality: 'minor 7th',       shape: 'minor7'   },
           { name: 'F',      numeral: '\u266DII',     tones: ['F','A','C'],          desc: 'THE Phrygian chord — half-step menace', quality: 'major',      shape: 'major'    },
-          { name: 'G7',     numeral: '\u266DIII7',   tones: ['G','B','D','F'],      desc: 'Dominant — fleeting brightness',     quality: 'dominant 7th',    shape: 'dom7'     },
+          { name: 'G7',     numeral: '\u266DIII7',   tones: ['G','B','D','F'],      desc: 'Relative major dominant \u2014 fleeting brightness', quality: 'dominant 7th',   shape: 'dom7'     },
           { name: 'Am7',    numeral: 'iv7',     tones: ['A','C','E','G'],      desc: 'Minor subdominant — deepening',     quality: 'minor 7th',       shape: 'minor7'   },
           { name: 'Bdim',   numeral: 'v\u00B0',     tones: ['B','D','F'],          desc: 'Diminished v — unstable tension',   quality: 'diminished',      shape: 'dim'      },
           { name: 'Dm7',    numeral: '\u266DVII7',   tones: ['D','F','A','C'],      desc: 'Subtonic minor — drifting cadence', quality: 'minor 7th',       shape: 'minor7'   },
@@ -1108,7 +1108,6 @@ const KNOWN_VOICINGS = {
 
   // Additional minor 7th
   'G#m7':  [['4','6','4','4','4','4','Em7 barre']],
-  'Dm7':   [['x','x','0','2','1','1','Dm7 shape']],
 
   // 9ths & extensions
   'Eadd9': [['0','2','2','1','0','2','Eadd9 shape']],
@@ -1120,7 +1119,7 @@ const KNOWN_VOICINGS = {
   'Amaj9': [['x','0','2','1','0','0','Amaj9 shape']],
   'F#7':   [['2','4','2','3','2','2','E7 barre']],
   'F#9':   [['2','4','2','3','2','4','E9 barre']],
-  'B13':   [['x','2','1','2','2','2','B13 shape']],
+  'B13':   [['x','2','1','2','2','4','B13 shape']],
   'E13':   [['0','2','0','1','2','0','E13 shape']],
   'E5':    [['0','2','2','x','x','x','E5 shape']],
 
