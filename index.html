@@ -37,7 +37,7 @@
   }
   .page { width: 100%; max-width: 1200px; margin: 0 auto; padding: 16px 28px 0; }
 
-  .top-bar { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; border-bottom: 2px solid var(--tortoise); padding-bottom: 10px; }
+  .top-bar { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; border-bottom: 2px solid var(--tortoise); padding-bottom: 10px; border-image: linear-gradient(90deg, var(--tortoise), var(--chord-hl)) 1; }
   .top-bar h1 { font-family: var(--font-display); font-size: 22px; font-weight: 400; color: var(--text-primary); letter-spacing: -0.5px; }
   .top-bar h1 em { font-style: italic; color: var(--tortoise); }
   .top-bar .tuning { font-family: var(--font-mono); font-size: 12px; color: var(--text-tertiary); letter-spacing: 1px; width: 250px; text-align: right; flex-shrink: 0; }
@@ -86,7 +86,7 @@
   }
   .sf-knob {
     width: 12px; height: 12px; border-radius: 50%;
-    background: var(--tortoise);
+    background: var(--chord-hl);
     position: absolute; top: 1px;
     transition: left 0.2s ease;
   }
@@ -100,11 +100,11 @@
     color: var(--text-secondary); cursor: pointer; transition: all 0.15s ease;
   }
   .tab:hover { color: var(--text-primary); border-color: var(--tortoise); background: var(--bg-warm); }
-  .tab.active { background: var(--tortoise); color: #FFF8F0; border-color: var(--tortoise); }
+  .tab.active { background: var(--tortoise); color: #FFF8F0; border-color: var(--tortoise); box-shadow: 0 2px 0 0 var(--chord-hl); }
 
   .scale-info { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 2px; }
   .scale-name { font-family: var(--font-display); font-size: 18px; font-weight: 400; }
-  .scale-genre { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--seafoam); font-weight: 500; }
+  .scale-genre { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--chord-hl); font-weight: 600; }
   .scale-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 8px; }
 
   .legend { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 6px; }
@@ -130,7 +130,7 @@
     transition: all 0.15s;
   }
   .pos-btn:hover { border-color: var(--tortoise); color: var(--text-secondary); }
-  .pos-btn.active { background: var(--tortoise); color: #FFF8F0; border-color: var(--tortoise); }
+  .pos-btn.active { background: var(--tortoise); color: #FFF8F0; border-color: var(--tortoise); box-shadow: 0 2px 0 0 var(--chord-hl); }
   .pos-btn .pos-frets {
     font-size: 9px; color: var(--text-tertiary); margin-left: 3px; font-weight: 400;
   }
@@ -151,7 +151,7 @@
   .chord-card:hover { border-color: #B8A898; background: var(--bg-card-hover); }
   .chord-card.highlight { border-color: var(--chord-hl) !important; background: #FFFCF5; }
   .cc-top { display: flex; align-items: center; gap: 6px; margin-bottom: 1px; }
-  .cc-numeral { font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--tortoise); background: rgba(107,58,42,0.08); padding: 1px 6px; border-radius: 3px; }
+  .cc-numeral { font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--chord-hl); background: rgba(193,125,26,0.1); padding: 1px 6px; border-radius: 3px; }
   .chord-name  { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--text-primary); }
   .chord-quality { font-size: 10px; color: var(--text-tertiary); margin-bottom: 4px; }
   .chord-desc  { font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border-light); }
@@ -214,7 +214,7 @@
   }
   .prog-chip:hover { border-color: var(--root-color); }
   .prog-chip .prog-num {
-    font-size: 10px; color: var(--tortoise); font-weight: 600;
+    font-size: 10px; color: var(--chord-hl); font-weight: 600;
   }
   .prog-chip .prog-x {
     font-size: 12px; color: var(--text-tertiary); margin-left: 2px;
@@ -230,6 +230,7 @@
   .prog-chip.dragging { opacity: 0.3; }
   .prog-chip.drag-over-left { box-shadow: -3px 0 0 0 var(--seafoam); }
   .prog-chip.drag-over-right { box-shadow: 3px 0 0 0 var(--seafoam); }
+  .prog-chip.active-chord { border-color: var(--seafoam); background: rgba(90,158,132,0.12); box-shadow: 0 0 0 2px rgba(90,158,132,0.25); }
   .prog-peek {
     display: none; position: fixed; z-index: 900;
     background: #FFFDF8; border: 1.5px solid var(--border); border-radius: 8px;
@@ -242,25 +243,42 @@
     letter-spacing: 1px; text-transform: uppercase; margin-top: 2px;
   }
   .prog-tempo {
-    display: flex; align-items: center; gap: 5px; margin-left: auto;
+    display: flex; align-items: center; gap: 8px; margin-left: auto;
   }
-  .prog-tempo label {
-    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.5px;
-    color: var(--text-tertiary); text-transform: uppercase;
-  }
-  .prog-tempo input {
-    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
-    width: 42px; text-align: center; padding: 2px 4px;
-    border-radius: 4px; border: 1.5px solid var(--border);
-    background: var(--bg-card); color: var(--text-primary);
-  }
-  .prog-tempo input:focus { outline: none; border-color: var(--tortoise); }
   .prog-tempo select {
     font-family: var(--font-mono); font-size: 12px; font-weight: 600;
     padding: 2px 6px; border-radius: 4px; border: 1.5px solid var(--border);
     background: var(--bg-card); color: var(--text-primary); cursor: pointer;
   }
   .prog-tempo select:focus { outline: none; border-color: var(--tortoise); }
+  .prog-tempo label {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.5px;
+    color: var(--text-tertiary); text-transform: uppercase;
+  }
+  .bpm-widget {
+    display: flex; align-items: stretch; height: 28px;
+    border: 1.5px solid var(--border); border-radius: 6px; overflow: hidden;
+    background: var(--bg-card);
+  }
+  .bpm-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 24px; border: none; background: var(--bg-warm);
+    color: var(--tortoise); font-size: 16px; font-weight: 700;
+    cursor: pointer; user-select: none; transition: all 0.1s;
+    font-family: var(--font-mono); line-height: 1; padding: 0;
+  }
+  .bpm-btn:hover { background: var(--tortoise); color: var(--bg-warm); }
+  .bpm-btn:active { transform: scale(0.92); }
+  .bpm-center {
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 8px; min-width: 42px;
+    border-left: 1px solid var(--border-light);
+    border-right: 1px solid var(--border-light);
+  }
+  .bpm-value {
+    font-family: var(--font-mono); font-size: 14px; font-weight: 800;
+    color: var(--chord-hl); line-height: 1; letter-spacing: -0.5px;
+  }
   .prog-strum {
     display: flex; align-items: stretch; gap: 0;
     border: 1.5px solid var(--border); border-radius: 6px; overflow: hidden;
@@ -273,7 +291,7 @@
   .strum-beat:last-child { border-right: none; }
   .strum-beat-num {
     font-family: var(--font-mono); font-size: 9px; font-weight: 700;
-    color: var(--text-tertiary); padding: 3px 0 2px;
+    color: var(--chord-hl); padding: 3px 0 2px;
     background: var(--bg-warm); width: 100%; text-align: center;
     border-bottom: 1px solid var(--border-light);
   }
@@ -290,7 +308,7 @@
     width: 12px; height: 12px; margin: 0; cursor: pointer;
     accent-color: var(--tortoise);
   }
-  .strum-toggle input[type="checkbox"]:checked + span { color: var(--tortoise); }
+  .strum-toggle input[type="checkbox"]:checked + span { color: var(--chord-hl); }
   .prog-play.playing {
     border-color: var(--seafoam); color: var(--seafoam); background: rgba(90,158,132,0.08);
   }
@@ -304,6 +322,55 @@
     border-color: var(--tortoise); color: var(--tortoise); background: rgba(107,58,42,0.08);
   }
   .prog-loop:hover { border-color: var(--tortoise); color: var(--tortoise); }
+
+  /* Drum machine */
+  .drum-section {
+    margin-top: 8px; border-top: 1px solid var(--border-light); padding-top: 8px;
+  }
+  .drum-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+  }
+  .drum-toggle {
+    font-family: var(--font-mono); font-size: 10px;
+    padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border);
+    background: transparent; color: var(--text-tertiary); cursor: pointer;
+    transition: all 0.12s;
+  }
+  .drum-toggle.active {
+    border-color: var(--tortoise); color: var(--tortoise); background: rgba(107,58,42,0.08);
+  }
+  .drum-toggle:hover { border-color: var(--tortoise); color: var(--tortoise); }
+  .drum-grid {
+    display: grid; gap: 2px;
+    grid-template-columns: 28px repeat(16, 1fr);
+  }
+  .drum-label {
+    font-family: var(--font-mono); font-size: 8px; font-weight: 700;
+    color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 4px; line-height: 1; user-select: none;
+  }
+  .drum-step {
+    aspect-ratio: 1.2; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--border-light); background: var(--bg-card);
+    transition: all 0.06s; min-height: 14px;
+  }
+  .drum-step:hover { border-color: var(--text-tertiary); transform: scale(1.1); }
+  .drum-step.beat-start { border-left: 1.5px solid var(--border); }
+  .drum-step.on.kick { background: var(--root-color); border-color: var(--root-color); }
+  .drum-step.on.snare { background: var(--tortoise); border-color: var(--tortoise); }
+  .drum-step.on.hh { background: var(--seafoam); border-color: var(--seafoam); }
+  .drum-step.on.oh { background: var(--chord-hl); border-color: var(--chord-hl); }
+  .drum-step.step-active { box-shadow: 0 0 0 2px rgba(90,158,132,0.5); }
+  .drum-beat-nums {
+    display: contents;
+  }
+  .drum-beat-num {
+    font-family: var(--font-mono); font-size: 7px; font-weight: 700;
+    color: var(--border); text-align: center; line-height: 1; padding-bottom: 1px;
+  }
+  .drum-beat-num.beat-start { color: var(--chord-hl); }
+
   .prog-empty {
     font-size: 12px; color: var(--text-tertiary); font-style: italic;
   }
@@ -788,7 +855,7 @@ function fretToMidi(s, f) {
 // A short noise burst is fed into a delay line whose length sets the pitch.
 // Each trip around the loop the sample is averaged with its neighbour (lowpass)
 // and scaled slightly below 1.0 so the note decays naturally.
-function playTone(freq, startTime, duration, velocity) {
+function playTone(freq, startTime, duration, velocity, dest) {
   var ctx = ensureAudio();
   var t = startTime || ctx.currentTime;
   var dur = duration || 1.6;
@@ -863,7 +930,7 @@ function playTone(freq, startTime, duration, velocity) {
 
   src.connect(shelf);
   shelf.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(dest || ctx.destination);
   src.start(t);
   src.stop(t + dur);
 }
@@ -881,6 +948,153 @@ function playChordStrum(assignment) {
   for (var i = 0; i < sorted.length; i++) {
     var midi = fretToMidi(sorted[i].string, sorted[i].fret);
     playTone(midiToFreq(midi), t + i * 0.035, 1.2);
+  }
+}
+
+// ──────────────────────────────────────────────────────
+//  DRUM SYNTHESIS
+// ──────────────────────────────────────────────────────
+
+function ensureDrumNoise() {
+  if (drumNoiseBuf) return drumNoiseBuf;
+  var ctx = ensureAudio(), sr = ctx.sampleRate, len = sr; // 1s
+  drumNoiseBuf = ctx.createBuffer(1, len, sr);
+  var d = drumNoiseBuf.getChannelData(0);
+  for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  return drumNoiseBuf;
+}
+
+function ensureDrumReverb() {
+  if (drumReverbBuf) return drumReverbBuf;
+  var ctx = ensureAudio(), sr = ctx.sampleRate, len = Math.floor(sr * 0.6);
+  drumReverbBuf = ctx.createBuffer(2, len, sr);
+  for (var ch = 0; ch < 2; ch++) {
+    var d = drumReverbBuf.getChannelData(ch);
+    for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (sr * 0.15));
+  }
+  return drumReverbBuf;
+}
+
+function createDrumBus(dest) {
+  var ctx = ensureAudio();
+  var input = ctx.createGain();
+  input.gain.value = 0.55;
+
+  var comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -16;
+  comp.knee.value = 6;
+  comp.ratio.value = 6;
+  comp.attack.value = 0.002;
+  comp.release.value = 0.08;
+
+  var hpf = ctx.createBiquadFilter();
+  hpf.type = 'highpass'; hpf.frequency.value = 50;
+  var lpf = ctx.createBiquadFilter();
+  lpf.type = 'lowpass'; lpf.frequency.value = 13000;
+
+  var dry = ctx.createGain(); dry.gain.value = 0.82;
+  var wet = ctx.createGain(); wet.gain.value = 0.18;
+  var conv = ctx.createConvolver();
+  conv.buffer = ensureDrumReverb();
+
+  input.connect(comp);
+  comp.connect(hpf);
+  hpf.connect(lpf);
+  lpf.connect(dry);
+  lpf.connect(conv);
+  conv.connect(wet);
+  dry.connect(dest);
+  wet.connect(dest);
+
+  return input;
+}
+
+function synthKick(t, dest) {
+  var ctx = ensureAudio();
+  var osc = ctx.createOscillator();
+  var g = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(150, t);
+  osc.frequency.exponentialRampToValueAtTime(35, t + 0.08);
+  g.gain.setValueAtTime(0.9, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+  osc.connect(g); g.connect(dest);
+  osc.start(t); osc.stop(t + 0.35);
+  // click transient
+  var click = ctx.createOscillator();
+  var cg = ctx.createGain();
+  click.type = 'square';
+  click.frequency.value = 400;
+  cg.gain.setValueAtTime(0.3, t);
+  cg.gain.exponentialRampToValueAtTime(0.001, t + 0.01);
+  click.connect(cg); cg.connect(dest);
+  click.start(t); click.stop(t + 0.015);
+}
+
+function synthSnare(t, dest) {
+  var ctx = ensureAudio();
+  // noise body
+  var ns = ctx.createBufferSource();
+  ns.buffer = ensureDrumNoise();
+  ns.playbackRate.value = 1 + Math.random() * 0.02; // slight variation
+  var nf = ctx.createBiquadFilter();
+  nf.type = 'bandpass'; nf.frequency.value = 3200; nf.Q.value = 0.8;
+  var ng = ctx.createGain();
+  ng.gain.setValueAtTime(0.55, t);
+  ng.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+  ns.connect(nf); nf.connect(ng); ng.connect(dest);
+  ns.start(t); ns.stop(t + 0.15);
+  // tonal body
+  var osc = ctx.createOscillator();
+  osc.type = 'sine'; osc.frequency.value = 185;
+  var og = ctx.createGain();
+  og.gain.setValueAtTime(0.45, t);
+  og.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+  osc.connect(og); og.connect(dest);
+  osc.start(t); osc.stop(t + 0.07);
+}
+
+function synthHH(t, dest) {
+  var ctx = ensureAudio();
+  var ns = ctx.createBufferSource();
+  ns.buffer = ensureDrumNoise();
+  ns.playbackRate.value = 1.5 + Math.random() * 0.3;
+  var hpf = ctx.createBiquadFilter();
+  hpf.type = 'highpass'; hpf.frequency.value = 7500;
+  var g = ctx.createGain();
+  g.gain.setValueAtTime(0.25, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+  ns.connect(hpf); hpf.connect(g); g.connect(dest);
+  ns.start(t); ns.stop(t + 0.05);
+}
+
+function synthOH(t, dest) {
+  var ctx = ensureAudio();
+  var ns = ctx.createBufferSource();
+  ns.buffer = ensureDrumNoise();
+  ns.playbackRate.value = 1.4 + Math.random() * 0.2;
+  var hpf = ctx.createBiquadFilter();
+  hpf.type = 'highpass'; hpf.frequency.value = 6000;
+  var g = ctx.createGain();
+  g.gain.setValueAtTime(0.25, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+  ns.connect(hpf); hpf.connect(g); g.connect(dest);
+  ns.start(t); ns.stop(t + 0.22);
+}
+
+// Schedule 16 drum steps over one chord's duration
+function scheduleDrumAudio(startTime, dest) {
+  var beatSec = 60 / progBPM;
+  var chordDur = beatSec * progBeats;
+  var stepDur = chordDur / 16;
+  var synthMap = { kick: synthKick, snare: synthSnare, hh: synthHH, oh: synthOH };
+  var keys = ['kick', 'snare', 'hh', 'oh'];
+  for (var k = 0; k < keys.length; k++) {
+    var row = drumPattern[keys[k]];
+    var fn = synthMap[keys[k]];
+    for (var s = 0; s < 16; s++) {
+      if (row[s]) fn(startTime + s * stepDur, dest);
+    }
   }
 }
 
@@ -1596,17 +1810,43 @@ var progBPM       = 100;
 var progBeats     = 4;
 // Strum pattern: per-beat array of {d:bool, u:bool}
 // Dynamically sized to match progBeats
+// Default: D DU UDU
+var strumDefaults = [
+  { d: true, u: false },
+  { d: true, u: true },
+  { d: false, u: true },
+  { d: true, u: true }
+];
 var strumPattern = [];
 function ensureStrumPattern() {
-  while (strumPattern.length < progBeats) strumPattern.push({ d: true, u: false });
+  while (strumPattern.length < progBeats) {
+    var i = strumPattern.length;
+    var def = i < strumDefaults.length ? strumDefaults[i] : { d: true, u: false };
+    strumPattern.push({ d: def.d, u: def.u });
+  }
   if (strumPattern.length > progBeats) strumPattern.length = progBeats;
 }
 ensureStrumPattern();
 
 // Playback state machine
-var progPlaying = false;
-var progLooping = true;
-var progTimer   = null; // setTimeout id for next loop iteration
+var progPlaying      = false;
+var progLooping      = true;
+var progTimer        = null;  // rAF id
+var progCurrentChord = -1;    // index of currently playing chord
+var progMasterGain   = null;  // master gain node for instant stop
+
+// Drum machine state
+var drumEnabled = false;
+var drumPattern = {
+  kick:  [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,0,0,0],
+  snare: [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,1],
+  hh:    [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0],
+  oh:    [0,0,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,0]
+};
+var progDrumBus    = null; // drum bus input node
+var drumNoiseBuf   = null; // shared noise buffer
+var drumReverbBuf  = null; // reverb impulse response
+var progDrumStep   = -1;   // current step for highlight
 
 // A valid scale position must satisfy three rules:
 //   1. Every scale degree appears at least once in the fret range
@@ -1990,7 +2230,15 @@ function renderProgStrip() {
   for (var b = 1; b <= 8; b++) {
     beatsOpts += `<option value="${b}"${b === progBeats ? ' selected' : ''}>${b}</option>`;
   }
-  var tempo = `<div class="prog-tempo"><label>BPM</label><input type="number" min="40" max="240" value="${progBPM}" onchange="setProgBPM(this.value)"><label>Beats</label><select onchange="setProgBeats(this.value)">${beatsOpts}</select></div>`;
+  var tempo = `<div class="prog-tempo">` +
+    `<label>BPM</label>` +
+    `<div class="bpm-widget">` +
+      `<button class="bpm-btn" onclick="nudgeBPM(-1)" title="Slower">&minus;</button>` +
+      `<div class="bpm-center"><span class="bpm-value">${progBPM}</span></div>` +
+      `<button class="bpm-btn" onclick="nudgeBPM(1)" title="Faster">+</button>` +
+    `</div>` +
+    `<label>Beats</label><select onchange="setProgBeats(this.value)">${beatsOpts}</select>` +
+  `</div>`;
 
   // Per-beat strum pattern editor
   ensureStrumPattern();
@@ -2007,9 +2255,41 @@ function renderProgStrip() {
     strumHtml += '</div>';
   }
 
+  // Drum machine grid
+  var drumHtml = '';
+  if (progression.length > 0) {
+    var rows = ['kick', 'snare', 'hh', 'oh'];
+    var labels = { kick: 'KCK', snare: 'SNR', hh: 'HH', oh: 'OH' };
+    drumHtml = '<div class="drum-section">' +
+      '<div class="drum-header">' +
+        '<button class="drum-toggle' + (drumEnabled ? ' active' : '') + '" onclick="toggleDrums()">Drums</button>' +
+      '</div>';
+    if (drumEnabled) {
+      drumHtml += '<div class="drum-grid">';
+      // Beat number row
+      drumHtml += '<div class="drum-label"></div>';
+      for (var s = 0; s < 16; s++) {
+        var isBeat = (s % 4 === 0);
+        drumHtml += '<div class="drum-beat-num' + (isBeat ? ' beat-start' : '') + '">' + (isBeat ? (s / 4 + 1) : '') + '</div>';
+      }
+      for (var r = 0; r < rows.length; r++) {
+        var key = rows[r];
+        drumHtml += '<div class="drum-label">' + labels[key] + '</div>';
+        for (var s = 0; s < 16; s++) {
+          var on = drumPattern[key][s] ? ' on' : '';
+          var bs = (s % 4 === 0) ? ' beat-start' : '';
+          drumHtml += '<div class="drum-step ' + key + on + bs + '" data-row="' + key + '" data-step="' + s + '" onclick="toggleDrumStep(\'' + key + '\',' + s + ')"></div>';
+        }
+      }
+      drumHtml += '</div>';
+    }
+    drumHtml += '</div>';
+  }
+
   return `<div class="prog-strip">
     <div class="prog-header"><span class="prog-label">Progression</span>${btns}${tempo}${strumHtml}</div>
     <div class="prog-chips">${chips}</div>
+    ${drumHtml}
   </div>`;
 }
 
@@ -2100,6 +2380,11 @@ window.progDragEnd = function(e) {
 function renderProgOnly() {
   var el = document.querySelector('.prog-strip');
   if (el) el.outerHTML = renderProgStrip();
+  // Re-apply playback highlights if playing
+  if (progPlaying) {
+    if (progCurrentChord >= 0) highlightProgChip(progCurrentChord);
+    if (progDrumStep >= 0) highlightDrumStep(progDrumStep);
+  }
 }
 
 window.playChordByName = function(name) {
@@ -2147,6 +2432,10 @@ window.hidePeek = function() {
 window.setProgBPM = function(v) {
   progBPM = Math.max(40, Math.min(240, parseInt(v) || 100));
   savePrefs();
+  renderProgOnly();
+};
+window.nudgeBPM = function(delta) {
+  setProgBPM(progBPM + delta);
 };
 window.setProgBeats = function(v) {
   progBeats = Math.max(1, Math.min(8, parseInt(v) || 4));
@@ -2168,35 +2457,72 @@ window.toggleLoop = function() {
   renderProgOnly();
 };
 
-window.stopProgression = function() {
-  progPlaying = false;
-  if (progTimer) { clearTimeout(progTimer); progTimer = null; }
+window.toggleDrums = function() {
+  drumEnabled = !drumEnabled;
+  savePrefs();
   renderProgOnly();
 };
 
-// Schedule one pass of the progression, return total duration in seconds
-function scheduleProgPass(startTime) {
-  var ctx = ensureAudio();
+window.toggleDrumStep = function(row, step) {
+  drumPattern[row][step] = drumPattern[row][step] ? 0 : 1;
+  // Toggle class directly instead of re-rendering
+  var el = document.querySelector('.drum-step[data-row="' + row + '"][data-step="' + step + '"]');
+  if (el) el.classList.toggle('on');
+  savePrefs();
+};
+
+window.stopProgression = function() {
+  progPlaying = false;
+  if (progTimer) { cancelAnimationFrame(progTimer); progTimer = null; }
+  // Instant silence: kill the master gain
+  if (progMasterGain) {
+    try { progMasterGain.gain.setValueAtTime(0, audioCtx.currentTime); } catch(e) {}
+    progMasterGain.disconnect();
+    progMasterGain = null;
+  }
+  progCurrentChord = -1;
+  progDrumStep = -1;
+  progDrumBus = null;
+  highlightProgChip(-1);
+  highlightDrumStep(-1);
+  renderProgOnly();
+};
+
+function highlightProgChip(idx) {
+  var chips = document.querySelectorAll('.prog-chip');
+  for (var i = 0; i < chips.length; i++) chips[i].classList.remove('active-chord');
+  if (idx >= 0 && idx < chips.length) chips[idx].classList.add('active-chord');
+}
+
+function highlightDrumStep(step) {
+  var steps = document.querySelectorAll('.drum-step');
+  for (var i = 0; i < steps.length; i++) steps[i].classList.remove('step-active');
+  // Steps are in 4 rows × 16 cols in the DOM
+  if (step >= 0 && step < 16) {
+    var cols = document.querySelectorAll('.drum-step[data-step="' + step + '"]');
+    for (var i = 0; i < cols.length; i++) cols[i].classList.add('step-active');
+  }
+}
+
+// Schedule a single chord's strums at a precise audio-clock start time
+function scheduleChordAudio(p, startTime, dest) {
   var beatSec = 60 / progBPM;
   var halfBeat = beatSec * 0.5;
-  var t = startTime;
 
-  for (var i = 0; i < progression.length; i++) {
-    var p = progression[i];
-    if (!p.assignment || !p.assignment.length) { t += beatSec * progBeats; continue; }
+  if (p.assignment && p.assignment.length) {
     var loToHi = p.assignment.slice().sort(function(a, b) { return a.string - b.string; });
     var hiToLo = loToHi.slice().reverse();
 
     ensureStrumPattern();
     for (var b = 0; b < progBeats; b++) {
       var sb = strumPattern[b];
-      var beatT = t + b * beatSec;
+      var beatT = startTime + b * beatSec;
       var vel = b === 0 ? 1.0 : 0.6;
 
       if (sb.d) {
         for (var j = 0; j < loToHi.length; j++) {
           var midi = fretToMidi(loToHi[j].string, loToHi[j].fret);
-          playTone(midiToFreq(midi), beatT + j * 0.018, beatSec * 0.8, vel);
+          playTone(midiToFreq(midi), beatT + j * 0.018, beatSec * 0.8, vel, dest);
         }
       }
 
@@ -2205,39 +2531,112 @@ function scheduleProgPass(startTime) {
         var upVel = vel * 0.7;
         for (var j = 0; j < hiToLo.length; j++) {
           var midi = fretToMidi(hiToLo[j].string, hiToLo[j].fret);
-          playTone(midiToFreq(midi), upT + j * 0.015, halfBeat * 0.8, upVel);
+          playTone(midiToFreq(midi), upT + j * 0.015, halfBeat * 0.8, upVel, dest);
         }
       }
     }
-    t += beatSec * progBeats;
   }
-  return t - startTime;
+  return beatSec * progBeats;
 }
 
 window.playProgression = function() {
   if (!progression.length) return;
   if (progPlaying) { stopProgression(); return; }
 
+  var ctx = ensureAudio();
+  progMasterGain = ctx.createGain();
+  progMasterGain.connect(ctx.destination);
+  progDrumBus = drumEnabled ? createDrumBus(progMasterGain) : null;
   progPlaying = true;
+  progDrumStep = -1;
   renderProgOnly();
 
-  var ctx = ensureAudio();
+  // Lookahead scheduler: use the audio clock for precise timing,
+  // rAF to poll and schedule chords ahead of when they're needed.
+  var LOOKAHEAD = 0.1; // schedule 100ms ahead
+  var nextChordIdx = 0;
+  var nextChordTime = ctx.currentTime;
+  // Ring buffer of {idx, time, dur} for highlight tracking
+  var scheduled = [];
 
-  function loop() {
+  function tick() {
     if (!progPlaying) return;
-    var passDur = scheduleProgPass(ctx.currentTime);
-    if (progLooping && progPlaying) {
-      progTimer = setTimeout(loop, passDur * 1000);
-    } else {
-      // Stop after this pass finishes
-      progTimer = setTimeout(function() {
-        progPlaying = false;
-        progTimer = null;
-        renderProgOnly();
-      }, passDur * 1000);
+    if (progression.length === 0) { stopProgression(); return; }
+
+    // Rebuild drum bus if toggled during playback
+    if (drumEnabled && !progDrumBus && progMasterGain) {
+      progDrumBus = createDrumBus(progMasterGain);
     }
+
+    // Schedule chords whose start time falls within the lookahead window
+    while (nextChordTime < ctx.currentTime + LOOKAHEAD) {
+      var idx = nextChordIdx;
+      if (idx >= progression.length) {
+        if (progLooping) {
+          idx = 0;
+          nextChordIdx = 0;
+        } else {
+          var endTime = nextChordTime;
+          (function(et) {
+            function waitDone() {
+              if (!progPlaying) return;
+              if (ctx.currentTime >= et) { stopProgression(); return; }
+              progTimer = requestAnimationFrame(waitDone);
+            }
+            progTimer = requestAnimationFrame(waitDone);
+          })(endTime);
+          return;
+        }
+      }
+      if (idx >= progression.length) idx = 0;
+
+      var p = progression[idx];
+      var dur = scheduleChordAudio(p, nextChordTime, progMasterGain);
+      // Schedule drums for this chord's duration
+      if (drumEnabled && progDrumBus) {
+        scheduleDrumAudio(nextChordTime, progDrumBus);
+      }
+      scheduled.push({ idx: idx, time: nextChordTime, dur: dur });
+      while (scheduled.length > 4 && scheduled[0].time < ctx.currentTime - 0.5) {
+        scheduled.shift();
+      }
+      nextChordTime += dur;
+      nextChordIdx = idx + 1;
+    }
+
+    // Highlight chord chip
+    var now = ctx.currentTime;
+    var activeIdx = -1;
+    var activeTime = 0, activeDur = 0;
+    for (var i = scheduled.length - 1; i >= 0; i--) {
+      if (scheduled[i].time <= now) {
+        activeIdx = scheduled[i].idx;
+        activeTime = scheduled[i].time;
+        activeDur = scheduled[i].dur;
+        break;
+      }
+    }
+    if (activeIdx >= 0 && activeIdx !== progCurrentChord) {
+      progCurrentChord = activeIdx;
+      highlightProgChip(activeIdx);
+    }
+
+    // Highlight drum step
+    if (drumEnabled && activeDur > 0) {
+      var elapsed = now - activeTime;
+      var step = Math.floor((elapsed / activeDur) * 16);
+      if (step < 0) step = 0;
+      if (step > 15) step = 15;
+      if (step !== progDrumStep) {
+        progDrumStep = step;
+        highlightDrumStep(step);
+      }
+    }
+
+    progTimer = requestAnimationFrame(tick);
   }
-  loop();
+
+  progTimer = requestAnimationFrame(tick);
 };
 
 window.toggleIntervals = function() {
@@ -2259,7 +2658,8 @@ function savePrefs() {
   localStorage.setItem('scaleAtlas', JSON.stringify({
     tab: activeTab, root: activeRoot, capo: capoFret, sharps: useSharps,
     intervals: showIntervals, progression: progression,
-    bpm: progBPM, beats: progBeats, strum: strumPattern
+    bpm: progBPM, beats: progBeats, strum: strumPattern,
+    drumOn: drumEnabled, drums: drumPattern
   }));
 }
 function loadPrefs() {
@@ -2276,6 +2676,13 @@ function loadPrefs() {
     if (typeof p.beats === 'number') progBeats = p.beats;
     if (Array.isArray(p.strum)) strumPattern = p.strum;
     ensureStrumPattern();
+    if (typeof p.drumOn === 'boolean') drumEnabled = p.drumOn;
+    if (p.drums) {
+      var keys = ['kick', 'snare', 'hh', 'oh'];
+      for (var k = 0; k < keys.length; k++) {
+        if (Array.isArray(p.drums[keys[k]])) drumPattern[keys[k]] = p.drums[keys[k]];
+      }
+    }
   } catch(e) {}
 }
 
