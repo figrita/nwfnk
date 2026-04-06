@@ -1804,6 +1804,7 @@ var tooltip      = document.getElementById('tooltip');
 var cardPosState = {};
 var showIntervals = false;
 var activePosition = -1; // -1 = all, 0..N = box index
+var fiveMode = 0; // 0 = no 5s, 1 = high 5s (≥7), 2 = all 5s
 var scalePositions = [];
 var progression   = [];
 var progBPM       = 100;
@@ -1848,76 +1849,93 @@ var drumNoiseBuf   = null; // shared noise buffer
 var drumReverbBuf  = null; // reverb impulse response
 var progDrumStep   = -1;   // current step for highlight
 
-// A valid scale position must satisfy three rules:
-//   1. Every scale degree appears at least once in the fret range
-//   2. Every string has at least 2 scale notes (so you can play up/down it)
-//   3. Every degree appears on at least 2 strings (no note stranded on one string)
-// Together these enforce playable octave coverage without tracking actual
-// pitch octaves — if a degree only existed on one string at the box edge,
-// rule 3 rejects it and the window widens until the note shows up on a
-// neighboring string too. Minimum window is 4 frets; expands up to 7 if needed.
-// Then we tile the valid windows up the neck, preferring the narrowest at each step.
+// Find all positions where you can play the scale without skipping notes.
+// A position is valid when you can run up every string crossing (low→high)
+// and hit every consecutive scale tone — nothing missing between strings.
 function computeScalePositions(scale) {
   var capoMin = Math.max(0, capoFret);
-  var candidates = [];
 
-  for (var startF = capoMin; startF <= capoMin + 13; startF++) {
-    for (var hi = startF + 3; hi <= Math.min(startF + 6, FRET_COUNT); hi++) {
-      var degreeStrings = {};
-      var stringsOK = true;
-      for (var s = 0; s < 6; s++) {
-        var count = 0;
-        for (var f = startF; f <= hi; f++) {
-          var n = noteAtFret(s, f);
-          if (noteInSet(n, scale.notes)) {
-            for (var d = 0; d < scale.notes.length; d++) {
-              if (notesMatch(n, scale.notes[d])) {
-                degreeStrings[d] = (degreeStrings[d] || 0) + 1;
-                break;
-              }
-            }
-            count++;
-          }
-        }
-        if (count < 2) stringsOK = false; // rule 2
-      }
-      var allDegrees = Object.keys(degreeStrings).length >= scale.notes.length; // rule 1
-      var allSpread = true;
-      for (var d in degreeStrings) { if (degreeStrings[d] < 2) allSpread = false; } // rule 3
-      if (allDegrees && stringsOK && allSpread) {
-        candidates.push({ lo: startF, hi: hi });
-        break;
-      }
-    }
+  // Build a set of chromatic pitch classes that belong to this scale
+  var scalePC = {};
+  for (var i = 0; i < scale.notes.length; i++) {
+    scalePC[noteIdx(scale.notes[i])] = true;
   }
 
-  var valid = candidates;
-  valid.sort(function(a, b) { return a.lo - b.lo; });
+  function isScalePC(midi) { return scalePC[(midi % 12 + 12) % 12] === true; }
 
-  // Tile valid windows up the neck — each new position starts where the
-  // previous one ended (±1 fret overlap). When multiple candidates start
-  // at the same fret, pick the narrowest.
+  // Can you play the full scale across these frets without skipping a note?
+  function windowOK(lo, hi) {
+    var pcSeen = {};
+    var stringHi = []; // highest scale MIDI per string
+    var stringLo = []; // lowest scale MIDI per string
+    for (var s = 0; s < 6; s++) {
+      var first = -1, last = -1, count = 0;
+      for (var f = lo; f <= hi; f++) {
+        var m = fretToMidi(s, f);
+        if (isScalePC(m)) {
+          pcSeen[(m % 12 + 12) % 12] = true;
+          if (first === -1) first = m;
+          last = m;
+          count++;
+        }
+      }
+      if (count < 2) return false;
+      stringLo.push(first);
+      stringHi.push(last);
+    }
+    // All pitch classes present
+    for (var pc in scalePC) {
+      if (!pcSeen[pc]) return false;
+    }
+    // String crossings: no skipped scale tone between adjacent strings
+    for (var s = 0; s < 5; s++) {
+      var top = stringHi[s], bot = stringLo[s + 1];
+      if (bot <= top) continue; // strings overlap in pitch — fine
+      for (var m = top + 1; m < bot; m++) {
+        if (isScalePC(m)) return false;
+      }
+    }
+    return true;
+  }
+
+  // Every valid 4-fret span — try every possible starting fret
   var selected = [];
-  if (valid.length) {
-    selected.push(valid[0]);
-    var cursor = valid[0].hi;
-    for (var i = 1; i < valid.length; i++) {
-      if (valid[i].lo >= cursor && valid[i].lo <= cursor + 1) {
-        // Look ahead for a narrower candidate at the same or next lo
-        var best = valid[i];
-        for (var k = i + 1; k < valid.length && valid[k].lo <= best.lo + 1; k++) {
-          if (valid[k].lo >= cursor && valid[k].lo <= cursor + 1 && (valid[k].hi - valid[k].lo) < (best.hi - best.lo)) {
-            best = valid[k];
-          }
-        }
-        selected.push(best);
-        cursor = best.hi;
+  for (var startF = capoMin; startF <= FRET_COUNT - 3; startF++) {
+    if (windowOK(startF, startF + 3)) {
+      selected.push({ lo: startF, hi: startF + 3 });
+    }
+  }
+
+  // Every valid 5-fret span, only where no 4 overlaps significantly
+  if (fiveMode > 0) {
+    // A 5-span [s, s+4] is redundant if a 4-span exists at [s, s+3] or [s+1, s+4]
+    var fourStarts = {};
+    for (var i = 0; i < selected.length; i++) fourStarts[selected[i].lo] = true;
+    for (var startF = capoMin; startF <= FRET_COUNT - 4; startF++) {
+      if (fourStarts[startF] || fourStarts[startF + 1]) continue;
+      var allow = (fiveMode === 2) || (fiveMode === 1 && startF >= 7);
+      if (!allow) continue;
+      if (windowOK(startF, startF + 4)) {
+        selected.push({ lo: startF, hi: startF + 4 });
       }
     }
   }
+
+  // Always allow 5-fret at open (free fret)
+  var hasOpen = false;
+  for (var i = 0; i < selected.length; i++) {
+    if (selected[i].lo === 0) { hasOpen = true; break; }
+  }
+  if (!hasOpen && windowOK(0, 4)) {
+    selected.push({ lo: 0, hi: 4 });
+  }
+
+  selected.sort(function(a, b) { return a.lo - b.lo; });
 
   for (var i = 0; i < selected.length; i++) {
-    selected[i].label = i + 1;
+    selected[i].label = selected[i].lo === 0
+      ? 'Open'
+      : selected[i].lo + '\u2013' + selected[i].hi;
   }
   return selected;
 }
@@ -2080,13 +2098,27 @@ function render() {
 
   // Compute scale positions
   scalePositions = computeScalePositions(scale);
+  if (window.__restorePos) {
+    var rp = window.__restorePos;
+    delete window.__restorePos;
+    for (var i = 0; i < scalePositions.length; i++) {
+      if (scalePositions[i].lo === rp.lo && scalePositions[i].hi === rp.hi) {
+        activePosition = i; break;
+      }
+    }
+  }
   if (activePosition >= scalePositions.length) activePosition = -1;
 
-  var posBarHTML = '<div class="pos-bar"><span class="pos-bar-label">Position</span>';
+  var posBarHTML = '<div class="pos-bar"><span class="pos-bar-label">5-fret</span>';
+  posBarHTML += `<button class="pos-btn${fiveMode===0?' active':''}" onclick="setFiveMode(0)">Off</button>`;
+  posBarHTML += `<button class="pos-btn${fiveMode===1?' active':''}" onclick="setFiveMode(1)">High</button>`;
+  posBarHTML += `<button class="pos-btn${fiveMode===2?' active':''}" onclick="setFiveMode(2)">All</button>`;
+  posBarHTML += '</div>';
+  posBarHTML += '<div class="pos-bar"><span class="pos-bar-label">Position</span>';
   posBarHTML += `<button class="pos-btn${activePosition===-1?' active':''}" onclick="setPosition(-1)">All</button>`;
   for (var i = 0; i < scalePositions.length; i++) {
     var sp = scalePositions[i];
-    posBarHTML += `<button class="pos-btn${activePosition===i?' active':''}" onclick="setPosition(${i})">${sp.label}<span class="pos-frets">fr ${sp.lo}\u2013${sp.hi}</span></button>`;
+    posBarHTML += `<button class="pos-btn${activePosition===i?' active':''}" onclick="setPosition(${i})">${sp.label}</button>`;
   }
   posBarHTML += '</div>';
 
@@ -2647,6 +2679,17 @@ window.toggleIntervals = function() {
 
 window.setPosition = function(idx) {
   activePosition = idx;
+  render();
+};
+window.setFiveMode = function(mode) {
+  // Try to preserve current position by matching its fret range
+  var prev = (activePosition >= 0 && scalePositions[activePosition]) ? scalePositions[activePosition] : null;
+  fiveMode = mode;
+  if (prev) {
+    // Will be resolved after render recomputes positions
+    window.__restorePos = { lo: prev.lo, hi: prev.hi };
+  }
+  activePosition = -1;
   render();
 };
 
